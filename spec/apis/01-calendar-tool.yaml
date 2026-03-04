@@ -1,0 +1,104 @@
+tool: calendar
+complexity: medium
+transport: stdio
+protocol: MCP 2024-11-05
+
+description: |
+  Provides access to a user's calendar/agenda. Supports listing, searching,
+  and filtering events from simulated data (calendar.json).
+
+actions:
+  - name: list_events
+    description: List all calendar events, optionally filtered
+    arguments:
+      - name: category
+        type: Option<String>
+        required: false
+        description: Filter by category (work, personal, medical, family, education, maintenance, birthday)
+      - name: priority
+        type: Option<String>
+        required: false
+        description: Filter by priority (high, medium, low)
+      - name: status
+        type: Option<String>
+        required: false
+        description: Filter by status (confirmed, tentative, cancelled)
+
+  - name: get_event
+    description: Get a single event by its ID
+    arguments:
+      - name: event_id
+        type: String
+        required: true
+        description: The event ID (e.g. "evt_001")
+
+  - name: search_events
+    description: Full-text search across event titles and descriptions
+    arguments:
+      - name: query
+        type: String
+        required: true
+        description: Search query string (case-insensitive)
+
+  - name: events_by_date
+    description: Get all events occurring on a specific date
+    arguments:
+      - name: date
+        type: String
+        required: true
+        description: Date in YYYY-MM-DD format
+
+  - name: events_by_category
+    description: Get all events in a specific category
+    arguments:
+      - name: category
+        type: String
+        required: true
+        description: Category name
+
+  - name: upcoming_events
+    description: Get the next N upcoming events (sorted by start date)
+    arguments:
+      - name: count
+        type: Option<u32>
+        required: false
+        default: 5
+        description: Number of events to return
+
+input_schema:
+  type: object
+  properties:
+    action:
+      type: string
+      description: "The action to perform"
+      enum: [list_events, get_event, search_events, events_by_date, events_by_category, upcoming_events]
+    event_id:
+      type: string
+      description: "Event ID (required for get_event)"
+    query:
+      type: string
+      description: "Search query (required for search_events)"
+    date:
+      type: string
+      description: "Date in YYYY-MM-DD format (required for events_by_date)"
+    category:
+      type: string
+      description: "Category filter"
+    priority:
+      type: string
+      description: "Priority filter"
+    status:
+      type: string
+      description: "Status filter"
+    count:
+      type: integer
+      description: "Number of results (for upcoming_events)"
+  required: [action]
+
+errors:
+  - InvalidRequestError: Missing or unknown action
+  - InvalidRequestError: Missing required argument for the selected action
+  - DataNotFoundError: Event ID not found
+  - ToolError: Failed to load or parse calendar data
+
+data_source: calendar.json

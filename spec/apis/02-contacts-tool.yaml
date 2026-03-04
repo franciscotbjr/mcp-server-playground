@@ -1,0 +1,78 @@
+tool: contacts
+complexity: medium
+transport: stdio
+protocol: MCP 2024-11-05
+
+description: |
+  Provides access to a user's contacts. Supports listing, searching,
+  and filtering contacts from simulated data (contacts.json).
+
+actions:
+  - name: list_contacts
+    description: List all contacts, optionally filtered
+    arguments:
+      - name: tag
+        type: Option<String>
+        required: false
+        description: Filter by tag (colleague, friend, family, doctor, service, etc.)
+      - name: company
+        type: Option<String>
+        required: false
+        description: Filter by company name (case-insensitive)
+
+  - name: get_contact
+    description: Get a single contact by its ID
+    arguments:
+      - name: contact_id
+        type: String
+        required: true
+        description: The contact ID (e.g. "c001")
+
+  - name: search_contacts
+    description: Full-text search across contact names, company, and notes
+    arguments:
+      - name: query
+        type: String
+        required: true
+        description: Search query string (case-insensitive)
+
+  - name: contacts_by_tag
+    description: Get all contacts with a specific tag
+    arguments:
+      - name: tag
+        type: String
+        required: true
+        description: Tag name
+
+  - name: favorite_contacts
+    description: Get all contacts marked as favorite
+    arguments: []
+
+input_schema:
+  type: object
+  properties:
+    action:
+      type: string
+      description: "The action to perform"
+      enum: [list_contacts, get_contact, search_contacts, contacts_by_tag, favorite_contacts]
+    contact_id:
+      type: string
+      description: "Contact ID (required for get_contact)"
+    query:
+      type: string
+      description: "Search query (required for search_contacts)"
+    tag:
+      type: string
+      description: "Tag filter"
+    company:
+      type: string
+      description: "Company filter"
+  required: [action]
+
+errors:
+  - InvalidRequestError: Missing or unknown action
+  - InvalidRequestError: Missing required argument for the selected action
+  - DataNotFoundError: Contact ID not found
+  - ToolError: Failed to load or parse contacts data
+
+data_source: contacts.json

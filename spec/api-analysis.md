@@ -1,0 +1,115 @@
+# API Analysis: MCP Tools
+
+## Tool Complexity Assessment
+
+| Tool | Complexity | Reason |
+|------|-----------|--------|
+| Calendar | Medium | Multiple query actions, date parsing, nested types (location, attendees, recurrence) |
+| Contacts | Medium | Multiple query actions, nested types (phones, emails, addresses, social profiles) |
+
+## Calendar Tool — Data Shape
+
+```
+CalendarData
+├── name: String
+├── timeZone: String
+├── owner: String
+├── events: Vec<Event>
+│   ├── id: String
+│   ├── title: String
+│   ├── description: String
+│   ├── startDateTime: String (ISO 8601)
+│   ├── endDateTime: String (ISO 8601)
+│   ├── location: Option<Location>
+│   │   ├── name: String
+│   │   ├── address: Option<String>
+│   │   ├── type: Option<String>
+│   │   └── coordinates: Option<Coordinates>
+│   ├── attendees: Vec<Attendee>
+│   │   ├── contactId: String
+│   │   ├── name: String
+│   │   ├── email: String
+│   │   ├── status: String
+│   │   └── type: String
+│   ├── category: String
+│   ├── priority: String
+│   ├── status: String
+│   ├── allDay: bool
+│   ├── recurrence: Option<Recurrence>
+│   │   ├── frequency: String
+│   │   ├── interval: u32
+│   │   ├── until: Option<String>
+│   │   └── daysOfWeek: Option<Vec<String>>
+│   ├── reminders: Vec<Reminder>
+│   │   ├── method: String
+│   │   └── minutes: u32
+│   ├── color: Option<String>
+│   ├── createdAt: String
+│   └── updatedAt: String
+├── settings: CalendarSettings
+│   ├── defaultView: String
+│   ├── weekStartsOn: String
+│   ├── workingHours: WorkingHours
+│   ├── defaultReminder: u32
+│   └── categories: Vec<CategoryConfig>
+└── metadata: Metadata
+    ├── totalEvents: u32
+    ├── lastSync: String
+    └── version: String
+```
+
+## Contacts Tool — Data Shape
+
+```
+ContactsData
+├── contacts: Vec<Contact>
+│   ├── id: String
+│   ├── firstName: String
+│   ├── lastName: String
+│   ├── displayName: String
+│   ├── nickname: Option<String>
+│   ├── company: Option<String>
+│   ├── jobTitle: Option<String>
+│   ├── department: Option<String>
+│   ├── phoneNumbers: Vec<PhoneNumber>
+│   │   ├── type: String
+│   │   ├── number: String
+│   │   └── primary: Option<bool>
+│   ├── emails: Vec<ContactEmail>
+│   │   ├── type: String
+│   │   ├── address: String
+│   │   └── primary: Option<bool>
+│   ├── addresses: Vec<Address>
+│   │   ├── type: String
+│   │   ├── street: String
+│   │   ├── city: String
+│   │   ├── state: String
+│   │   ├── zipCode: String
+│   │   └── country: String
+│   ├── socialProfiles: Option<Vec<SocialProfile>>
+│   │   ├── platform: String
+│   │   └── username: String
+│   ├── birthday: Option<String>
+│   ├── anniversary: Option<String>
+│   ├── notes: Option<String>
+│   ├── tags: Vec<String>
+│   ├── favorite: bool
+│   ├── createdAt: String
+│   └── updatedAt: String
+└── metadata: Metadata
+    ├── totalContacts: u32
+    ├── lastSync: String
+    └── version: String
+```
+
+## Dependencies Between Tools
+
+- Event `attendees[].contactId` references `contacts[].id`
+- This cross-reference is informational only; tools operate independently
+
+## Implementation Order
+
+1. Calendar types (more complex due to date handling)
+2. Contacts types
+3. Calendar tool + queries
+4. Contacts tool + queries

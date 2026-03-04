@@ -1,9 +1,9 @@
 //! SSE transport handlers — `GET /sse` and `POST /message` endpoints.
 
-use crate::mcp::app_state::AppState;
-use crate::mcp::message_query::MessageQuery;
+use super::app_state::AppState;
+use super::message_query::MessageQuery;
+use super::session::{Session, SessionState, SessionStore};
 use crate::mcp::protocol::{JsonRpcError, JsonRpcRequest, JsonRpcResponse};
-use crate::mcp::session::{Session, SessionState, SessionStore};
 
 use axum::extract::{Query, State};
 use axum::response::sse::{Event, KeepAlive, Sse};

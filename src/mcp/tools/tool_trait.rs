@@ -1,7 +1,7 @@
 //! MCP tool trait — defines the interface each tool must implement.
 
 use crate::error::Result;
-use crate::mcp::types::{CallToolResult, InputSchema, ToolDefinition};
+use crate::mcp::protocol::{CallToolResult, InputSchema, ToolDefinition};
 
 use async_trait::async_trait;
 

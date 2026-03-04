@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Transport: stdio → SSE** — `McpServer` now runs an Axum HTTP server with `GET /sse` and `POST /message` endpoints, replacing the previous stdin/stdout loop
 - **`handler.rs` split** — Extracted `McpTool` trait into `tool_trait.rs` and `ToolRegistry` into `tool_registry.rs`; `handler.rs` now contains only `RequestHandler`
+- **`mcp/` reorganized into subdirectories** — `protocol/` (jsonrpc.rs, types.rs), `tools/` (tool_trait.rs, tool_registry.rs), `transport/` (server.rs, sse_handler.rs, session.rs, app_state.rs, message_query.rs); `handler.rs` stays at `mcp/` root as central dispatcher
+- **`protocol.rs` renamed to `jsonrpc.rs`** — Avoids clippy `module_inception` lint inside `protocol/` subdirectory
 - **Public type tests moved to `tests/`** — Following design-source convention, tests for public types are now in separate integration test files (`tests/error_tests.rs`, `tests/protocol_tests.rs`, `tests/types_tests.rs`, `tests/tool_registry_tests.rs`, `tests/handler_tests.rs`); `pub(crate)` tests remain inline
 - **`main.rs`** — Updated to bootstrap Axum HTTP server with `McpServer::new(handler, addr)`
 

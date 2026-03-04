@@ -54,6 +54,11 @@ Architectural decisions and trade-offs for the `mcp-server-playground` project.
 - Decision: Extract `McpTool` into `tool_trait.rs`, `ToolRegistry` into `tool_registry.rs`, and keep only `RequestHandler` in `handler.rs`.
 - Consequences: Better separation of concerns, each file has a single responsibility. Same applies to `server.rs` which was split into `session.rs`, `sse_handler.rs`, and a reduced `server.rs`.
 
+**[2026-03-04] Reorganize mcp/ into subdirectories**
+- Context: The flat `mcp/` directory had 10 files spanning three distinct domains: protocol types, tool abstraction, and SSE transport. As the project grows, a flat structure becomes harder to navigate.
+- Decision: Group files into `protocol/` (jsonrpc.rs, types.rs), `tools/` (tool_trait.rs, tool_registry.rs), and `transport/` (server.rs, sse_handler.rs, session.rs, app_state.rs, message_query.rs). `handler.rs` stays at `mcp/` root as it bridges protocol and tools. Each subdirectory has its own `mod.rs` facade.
+- Consequences: Clear domain boundaries. `protocol.rs` renamed to `jsonrpc.rs` to avoid clippy `module_inception` lint. Public API unchanged — `mcp/mod.rs` re-exports everything through subdirectory facades.
+
 **[2026-03-04] Public type tests in `tests/`, `pub(crate)` tests inline**
 - Context: The design-source methodology defines that unit tests of public types should be in separate files, not in the component source file.
 - Decision: Move all public type tests to `tests/{component}_tests.rs`. Keep `pub(crate)` tests (session internals, SSE handler internals) as inline `#[cfg(test)] mod tests` since integration tests cannot access `pub(crate)` items.

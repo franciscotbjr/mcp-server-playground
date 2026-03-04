@@ -1,11 +1,10 @@
 //! MCP request dispatcher — routes JSON-RPC methods to the appropriate handler.
 
-use crate::mcp::protocol::{JsonRpcRequest, JsonRpcResponse};
-use crate::mcp::tool_registry::ToolRegistry;
-use crate::mcp::types::{
-    CallToolParams, CallToolResult, InitializeResult, ListToolsResult, ServerCapabilities,
-    ServerInfo, ToolsCapability,
+use crate::mcp::protocol::{
+    CallToolParams, CallToolResult, InitializeResult, JsonRpcRequest, JsonRpcResponse,
+    ListToolsResult, ServerCapabilities, ServerInfo, ToolsCapability,
 };
+use crate::mcp::tools::ToolRegistry;
 
 /// Handles incoming JSON-RPC requests and dispatches them.
 pub struct RequestHandler {

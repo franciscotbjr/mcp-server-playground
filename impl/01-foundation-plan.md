@@ -29,7 +29,9 @@ Establish the project foundation: dependencies, error handling, MCP protocol typ
 12. **mcp/tool_trait.rs** — New: `McpTool` trait (extracted from handler.rs)
 13. **mcp/tool_registry.rs** — New: `ToolRegistry` struct (extracted from handler.rs)
 14. **mcp/handler.rs** — Reduced: only `RequestHandler` (dispatch logic)
-15. **mcp/mod.rs** — Updated facade: 10 submodules, public re-exports
+15. **mcp/mod.rs** — Updated facade: 3 subdirectory modules + handler, public re-exports
+15b. **mcp/ subdirectories** — Reorganized into `protocol/` (jsonrpc.rs, types.rs), `tools/` (tool_trait.rs, tool_registry.rs), `transport/` (server.rs, sse_handler.rs, session.rs, app_state.rs, message_query.rs); handler.rs stays at mcp/ root
+15c. **protocol.rs → jsonrpc.rs** — Renamed to avoid clippy `module_inception` lint
 16. **lib.rs** — Updated re-exports including `SessionState`, `JsonRpcNotification`
 17. **main.rs** — Updated: `McpServer::new(handler, addr)` bootstrap
 18. **tests/** — Public type tests moved to integration test files:
@@ -49,17 +51,23 @@ src/
 ├── lib.rs                # Crate root: module declarations + re-exports
 ├── error.rs              # Centralized Error enum
 └── mcp/
-    ├── mod.rs            # Facade: mod + pub use
-    ├── protocol.rs       # JSON-RPC 2.0 types
-    ├── types.rs          # MCP domain types
-    ├── tool_trait.rs     # McpTool trait
-    ├── tool_registry.rs  # ToolRegistry
+    ├── mod.rs            # Facade: mod + pub use (re-exports from subdirectories)
     ├── handler.rs        # RequestHandler (dispatch)
-    ├── session.rs        # SessionState, Session, SessionStore
-    ├── app_state.rs      # AppState (shared state for Axum handlers)
-    ├── message_query.rs  # MessageQuery (POST /message query params)
-    ├── sse_handler.rs    # SSE endpoint handlers + lifecycle enforcement
-    └── server.rs         # McpServer (HTTP bootstrap + graceful shutdown)
+    ├── protocol/         # JSON-RPC and MCP domain types
+    │   ├── mod.rs
+    │   ├── jsonrpc.rs    # JSON-RPC 2.0 types
+    │   └── types.rs      # MCP domain types
+    ├── tools/            # Tool abstraction layer
+    │   ├── mod.rs
+    │   ├── tool_trait.rs # McpTool trait
+    │   └── tool_registry.rs # ToolRegistry
+    └── transport/        # SSE transport + HTTP server
+        ├── mod.rs
+        ├── server.rs     # McpServer (HTTP bootstrap + graceful shutdown)
+        ├── sse_handler.rs # SSE endpoint handlers + lifecycle enforcement
+        ├── session.rs    # SessionState, Session, SessionStore
+        ├── app_state.rs  # AppState
+        └── message_query.rs # MessageQuery
 
 tests/
 ├── error_tests.rs

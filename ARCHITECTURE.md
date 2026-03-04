@@ -19,17 +19,23 @@ src/
 ├── lib.rs                # Crate root — module declarations and re-exports
 ├── error.rs              # Centralized Error enum with {Type}Error suffix convention
 └── mcp/                  # MCP protocol layer
-    ├── mod.rs            # Facade: mod + pub use
-    ├── protocol.rs       # JSON-RPC 2.0 types (request, response, error, notification)
-    ├── types.rs          # MCP domain types (ToolDefinition, CallToolResult, etc.)
-    ├── tool_trait.rs     # McpTool trait (interface for MCP tools)
-    ├── tool_registry.rs  # ToolRegistry (collection of registered tools)
+    ├── mod.rs            # Facade: mod + pub use (re-exports from subdirectories)
     ├── handler.rs        # RequestHandler (JSON-RPC method dispatcher)
-    ├── session.rs        # SessionState, Session, SessionStore (per-client lifecycle)
-    ├── app_state.rs      # AppState (shared state for Axum handlers)
-    ├── message_query.rs  # MessageQuery (POST /message query params)
-    ├── sse_handler.rs    # SSE endpoint handlers + lifecycle enforcement
-    └── server.rs         # McpServer — HTTP server bootstrap + graceful shutdown
+    ├── protocol/         # JSON-RPC and MCP domain types
+    │   ├── mod.rs        # Facade: mod + pub use
+    │   ├── jsonrpc.rs    # JSON-RPC 2.0 types (request, response, error, notification)
+    │   └── types.rs      # MCP domain types (ToolDefinition, CallToolResult, etc.)
+    ├── tools/            # Tool abstraction layer
+    │   ├── mod.rs        # Facade: mod + pub use
+    │   ├── tool_trait.rs # McpTool trait (interface for MCP tools)
+    │   └── tool_registry.rs # ToolRegistry (collection of registered tools)
+    └── transport/        # SSE transport + HTTP server
+        ├── mod.rs        # Facade: mod + pub use
+        ├── server.rs     # McpServer — HTTP bootstrap + graceful shutdown
+        ├── sse_handler.rs # SSE endpoint handlers + lifecycle enforcement
+        ├── session.rs    # SessionState, Session, SessionStore (per-client lifecycle)
+        ├── app_state.rs  # AppState (shared state for Axum handlers)
+        └── message_query.rs # MessageQuery (POST /message query params)
 
 tests/                    # Integration tests for public types
 ├── error_tests.rs        # Error enum tests

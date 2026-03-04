@@ -1,6 +1,8 @@
 //! MCP protocol layer — JSON-RPC types, MCP types, tools, handler, session, SSE transport, and server.
 
+mod app_state;
 mod handler;
+mod message_query;
 mod protocol;
 mod server;
 mod session;

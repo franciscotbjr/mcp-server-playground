@@ -6,7 +6,8 @@
 
 use crate::error::Result;
 use crate::mcp::handler::RequestHandler;
-use crate::mcp::sse_handler::{handle_message, handle_sse, AppState};
+use crate::mcp::app_state::AppState;
+use crate::mcp::sse_handler::{handle_message, handle_sse};
 
 use axum::routing::{get, post};
 use axum::Router;

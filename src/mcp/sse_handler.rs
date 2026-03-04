@@ -1,6 +1,7 @@
 //! SSE transport handlers — `GET /sse` and `POST /message` endpoints.
 
-use crate::mcp::handler::RequestHandler;
+use crate::mcp::app_state::AppState;
+use crate::mcp::message_query::MessageQuery;
 use crate::mcp::protocol::{JsonRpcError, JsonRpcRequest, JsonRpcResponse};
 use crate::mcp::session::{Session, SessionState, SessionStore};
 
@@ -8,32 +9,11 @@ use axum::extract::{Query, State};
 use axum::response::sse::{Event, KeepAlive, Sse};
 use axum::response::IntoResponse;
 use std::convert::Infallible;
-use std::sync::Arc;
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::ReceiverStream;
 use tokio_stream::StreamExt;
 use tracing::{debug, error, info, warn};
 use uuid::Uuid;
-
-// ---------------------------------------------------------------------------
-// Query params
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, serde::Deserialize)]
-pub(crate) struct MessageQuery {
-    #[serde(rename = "sessionId")]
-    session_id: String,
-}
-
-// ---------------------------------------------------------------------------
-// Shared application state
-// ---------------------------------------------------------------------------
-
-#[derive(Clone)]
-pub(crate) struct AppState {
-    pub(crate) sessions: SessionStore,
-    pub(crate) handler: Arc<RequestHandler>,
-}
 
 // ---------------------------------------------------------------------------
 // GET /sse — open SSE stream, send `endpoint` event
@@ -266,6 +246,7 @@ pub(crate) async fn send_to_session(
 mod tests {
     use super::*;
     use std::collections::HashMap;
+    use std::sync::Arc;
     use tokio::sync::Mutex;
 
     /// Helper: create a SessionStore with one session in the given state,

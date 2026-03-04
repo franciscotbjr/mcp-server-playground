@@ -23,11 +23,13 @@ Establish the project foundation: dependencies, error handling, MCP protocol typ
 8. **Cargo.toml** — Added `axum`, `tokio-stream`, `uuid`, `tower-http`; replaced tokio `io-util`/`io-std` with `signal`+`io-util`; added dev-deps `reqwest` (stream), `tokio-util`, `futures-util`
 9. **mcp/server.rs** — Rewritten: SSE transport via Axum HTTP server, graceful shutdown
 10. **mcp/session.rs** — New: `SessionState` enum, `Session` struct, `SessionStore` type alias
-11. **mcp/sse_handler.rs** — New: `handle_sse`, `handle_message`, `enforce_lifecycle`, `send_to_session`, `AppState`, `MessageQuery`
+11. **mcp/sse_handler.rs** — New: `handle_sse`, `handle_message`, `enforce_lifecycle`, `send_to_session`
+11b. **mcp/app_state.rs** — New: `AppState` shared state struct (extracted from `sse_handler.rs`)
+11c. **mcp/message_query.rs** — New: `MessageQuery` query params struct (extracted from `sse_handler.rs`)
 12. **mcp/tool_trait.rs** — New: `McpTool` trait (extracted from handler.rs)
 13. **mcp/tool_registry.rs** — New: `ToolRegistry` struct (extracted from handler.rs)
 14. **mcp/handler.rs** — Reduced: only `RequestHandler` (dispatch logic)
-15. **mcp/mod.rs** — Updated facade: 8 submodules, public re-exports
+15. **mcp/mod.rs** — Updated facade: 10 submodules, public re-exports
 16. **lib.rs** — Updated re-exports including `SessionState`, `JsonRpcNotification`
 17. **main.rs** — Updated: `McpServer::new(handler, addr)` bootstrap
 18. **tests/** — Public type tests moved to integration test files:
@@ -54,6 +56,8 @@ src/
     ├── tool_registry.rs  # ToolRegistry
     ├── handler.rs        # RequestHandler (dispatch)
     ├── session.rs        # SessionState, Session, SessionStore
+    ├── app_state.rs      # AppState (shared state for Axum handlers)
+    ├── message_query.rs  # MessageQuery (POST /message query params)
     ├── sse_handler.rs    # SSE endpoint handlers + lifecycle enforcement
     └── server.rs         # McpServer (HTTP bootstrap + graceful shutdown)
 

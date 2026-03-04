@@ -26,6 +26,8 @@ src/
     ├── tool_registry.rs  # ToolRegistry (collection of registered tools)
     ├── handler.rs        # RequestHandler (JSON-RPC method dispatcher)
     ├── session.rs        # SessionState, Session, SessionStore (per-client lifecycle)
+    ├── app_state.rs      # AppState (shared state for Axum handlers)
+    ├── message_query.rs  # MessageQuery (POST /message query params)
     ├── sse_handler.rs    # SSE endpoint handlers + lifecycle enforcement
     └── server.rs         # McpServer — HTTP server bootstrap + graceful shutdown
 

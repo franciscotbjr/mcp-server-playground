@@ -17,7 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `session.rs` — `SessionState` enum (`Uninitialized`, `Initializing`, `Ready`), `Session` struct, `SessionStore` type alias for per-client lifecycle tracking
-- `sse_handler.rs` — SSE endpoint handlers (`handle_sse`, `handle_message`), lifecycle enforcement (`enforce_lifecycle`), helper functions (`send_to_session`), `AppState`, `MessageQuery`
+- `sse_handler.rs` — SSE endpoint handlers (`handle_sse`, `handle_message`), lifecycle enforcement (`enforce_lifecycle`), helper functions (`send_to_session`)
+- `app_state.rs` — `AppState` shared state struct (extracted from `sse_handler.rs`)
+- `message_query.rs` — `MessageQuery` query params struct (extracted from `sse_handler.rs`)
 - `tool_trait.rs` — `McpTool` async trait (extracted from `handler.rs`)
 - `tool_registry.rs` — `ToolRegistry` struct with `register()`, `list_definitions()`, `call_tool()` (extracted from `handler.rs`)
 - MCP `initialize` lifecycle tests — lifecycle enforcement tests in `sse_handler.rs`, expanded initialize response tests in `handler_tests.rs`

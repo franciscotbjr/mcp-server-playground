@@ -56,7 +56,7 @@ Architectural decisions and trade-offs for the `mcp-server-playground` project.
 
 **[2026-03-04] Reorganize mcp/ into subdirectories**
 - Context: The flat `mcp/` directory had 10 files spanning three distinct domains: protocol types, tool abstraction, and SSE transport. As the project grows, a flat structure becomes harder to navigate.
-- Decision: Group files into `protocol/`, `tools/`, and `transport/`. `handler.rs` stays at `mcp/` root as it bridges protocol and tools. Each subdirectory has its own `mod.rs` facade. `protocol.rs` renamed to `jsonrpc.rs` to avoid clippy `module_inception` lint.
+- Decision: Group files into `protocol/`, `tools/`, and `transport/`. `handler.rs` stays at `mcp/` root as it bridges protocol and tools. Each subdirectory has its own `mod.rs` facade. `protocol.rs` split into one-type-per-file: `request.rs`, `response.rs`, `error.rs`, `notification.rs`.
 - Consequences: Clear domain boundaries. Public API unchanged — `mcp/mod.rs` re-exports everything through subdirectory facades.
 
 **[2026-03-04] Split types.rs and distribute types by domain**

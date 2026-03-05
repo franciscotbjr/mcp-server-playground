@@ -1,5 +1,11 @@
 //! JSON-RPC 2.0 wire format types.
 
-mod jsonrpc;
+mod error;
+mod notification;
+mod request;
+mod response;
 
-pub use jsonrpc::{JsonRpcError, JsonRpcNotification, JsonRpcRequest, JsonRpcResponse};
+pub use error::JsonRpcError;
+pub use notification::JsonRpcNotification;
+pub use request::JsonRpcRequest;
+pub use response::JsonRpcResponse;

@@ -31,7 +31,7 @@ Establish the project foundation: dependencies, error handling, MCP protocol typ
 14. **mcp/handler.rs** — Reduced: only `RequestHandler` (dispatch logic)
 15. **mcp/mod.rs** — Updated facade: 3 subdirectory modules + handler, public re-exports
 15b. **mcp/ subdirectories** — Reorganized into `protocol/`, `tools/`, `transport/`; handler.rs stays at mcp/ root
-15c. **protocol.rs → jsonrpc.rs** — Renamed to avoid clippy `module_inception` lint
+15c. **protocol.rs → jsonrpc.rs → one-type-per-file** — Split into request.rs, response.rs, error.rs, notification.rs
 15d. **types.rs split** — 10 individual files (one-type-per-file), then 6 tool-related types moved from `protocol/` to `tools/`
 16. **lib.rs** — Updated re-exports including `SessionState`, `JsonRpcNotification`
 17. **main.rs** — Updated: `McpServer::new(handler, addr)` bootstrap
@@ -56,7 +56,10 @@ src/
     ├── handler.rs        # RequestHandler (dispatch)
     ├── protocol/         # JSON-RPC 2.0 wire format
     │   ├── mod.rs
-    │   └── jsonrpc.rs    # JSON-RPC 2.0 types
+    │   ├── request.rs    # JsonRpcRequest
+    │   ├── response.rs   # JsonRpcResponse
+    │   ├── error.rs      # JsonRpcError
+    │   └── notification.rs # JsonRpcNotification
     ├── tools/            # Tool abstraction, types, and registry
     │   ├── mod.rs
     │   ├── tool_trait.rs # McpTool trait

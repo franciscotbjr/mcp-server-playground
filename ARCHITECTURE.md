@@ -23,7 +23,10 @@ src/
     ├── handler.rs        # RequestHandler (JSON-RPC method dispatcher)
     ├── protocol/         # JSON-RPC 2.0 wire format
     │   ├── mod.rs        # Facade: mod + pub use
-    │   └── jsonrpc.rs    # JSON-RPC 2.0 types (request, response, error, notification)
+    │   ├── request.rs    # JsonRpcRequest
+    │   ├── response.rs   # JsonRpcResponse
+    │   ├── error.rs      # JsonRpcError
+    │   └── notification.rs # JsonRpcNotification
     ├── tools/            # Tool abstraction, types, and registry
     │   ├── mod.rs        # Facade: mod + pub use
     │   ├── tool_trait.rs # McpTool trait (interface for MCP tools)

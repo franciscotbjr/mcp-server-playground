@@ -44,6 +44,7 @@ src/
         ├── session.rs    # SessionState, Session, SessionStore (per-client lifecycle)
         ├── app_state.rs  # AppState (shared state for Axum handlers)
         ├── message_query.rs # MessageQuery (POST /message query params)
+        ├── no_delay_listener.rs # NoDelayListener (TCP_NODELAY wrapper for TcpListener)
         ├── initialize_result.rs # InitializeResult
         ├── server_capabilities.rs # ServerCapabilities
         ├── server_info.rs # ServerInfo

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **SSE latency** — Added `NoDelayListener` wrapper that sets `TCP_NODELAY` on each accepted TCP connection, eliminating Nagle's algorithm buffering delay on small SSE events ([axum#2521](https://github.com/tokio-rs/axum/issues/2521))
+
+### Added
+
+- **Tracing logs** — `info!` logs for server initialization steps (`main.rs`) and JSON-RPC request handling (`handler.rs`)
+
 ### Changed
 
 - **Transport: stdio → SSE** — `McpServer` now runs an Axum HTTP server with `GET /sse` and `POST /message` endpoints, replacing the previous stdin/stdout loop

@@ -2,7 +2,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use super::input_schema::InputSchema;
+use super::InputSchema;
 
 /// Describes a tool that the MCP server exposes to clients.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

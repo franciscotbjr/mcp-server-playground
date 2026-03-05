@@ -2,7 +2,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use super::tool_definition::ToolDefinition;
+use super::ToolDefinition;
 
 /// Result of `tools/list`.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

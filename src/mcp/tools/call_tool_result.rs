@@ -2,7 +2,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use super::content::Content;
+use super::Content;
 
 /// The result returned by a tool invocation.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

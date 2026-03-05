@@ -1,8 +1,8 @@
 //! MCP tool registry — manages the collection of available tools.
 
 use crate::error::{Error, Result};
-use crate::mcp::tools::McpTool;
-use crate::mcp::protocol::{CallToolResult, ToolDefinition};
+use super::McpTool;
+use super::{CallToolResult, ToolDefinition};
 
 /// Registry of all available MCP tools.
 pub struct ToolRegistry {

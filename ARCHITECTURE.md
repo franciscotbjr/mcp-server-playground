@@ -21,14 +21,23 @@ src/
 └── mcp/                  # MCP protocol layer
     ├── mod.rs            # Facade: mod + pub use (re-exports from subdirectories)
     ├── handler.rs        # RequestHandler (JSON-RPC method dispatcher)
-    ├── protocol/         # JSON-RPC and MCP domain types
+    ├── protocol/         # JSON-RPC and MCP server protocol types
     │   ├── mod.rs        # Facade: mod + pub use
     │   ├── jsonrpc.rs    # JSON-RPC 2.0 types (request, response, error, notification)
-    │   └── types.rs      # MCP domain types (ToolDefinition, CallToolResult, etc.)
-    ├── tools/            # Tool abstraction layer
+    │   ├── initialize_result.rs # InitializeResult
+    │   ├── server_capabilities.rs # ServerCapabilities
+    │   ├── server_info.rs # ServerInfo
+    │   └── tools_capability.rs # ToolsCapability
+    ├── tools/            # Tool abstraction, types, and registry
     │   ├── mod.rs        # Facade: mod + pub use
     │   ├── tool_trait.rs # McpTool trait (interface for MCP tools)
-    │   └── tool_registry.rs # ToolRegistry (collection of registered tools)
+    │   ├── tool_registry.rs # ToolRegistry (collection of registered tools)
+    │   ├── tool_definition.rs # ToolDefinition (tool metadata)
+    │   ├── input_schema.rs # InputSchema (JSON Schema for tool input)
+    │   ├── call_tool_result.rs # CallToolResult (tool invocation result)
+    │   ├── call_tool_params.rs # CallToolParams (tools/call parameters)
+    │   ├── list_tools_result.rs # ListToolsResult (tools/list result)
+    │   └── content.rs    # Content (content block in tool results)
     └── transport/        # SSE transport + HTTP server
         ├── mod.rs        # Facade: mod + pub use
         ├── server.rs     # McpServer — HTTP bootstrap + graceful shutdown

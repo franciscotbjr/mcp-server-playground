@@ -62,24 +62,29 @@ src/
 │   ├── calendar_settings.rs # CalendarSettings, WorkingHours, CategoryConfig
 │   └── calendar_metadata.rs # CalendarMetadata
 
+├── contacts/             # Contacts domain types
+│   ├── mod.rs            # Facade: mod + pub use
+│   ├── contacts_data.rs  # ContactsData (top-level)
+│   ├── contact.rs        # Contact (main contact struct)
+│   ├── phone_number.rs   # PhoneNumber
+│   ├── contact_email.rs  # ContactEmail
+│   ├── address.rs        # Address
+│   ├── social_profile.rs # SocialProfile
+│   └── contacts_metadata.rs # ContactsMetadata
+
 tests/                    # Integration tests for public types
 ├── error_tests.rs        # Error enum tests (8 tests)
 ├── protocol_tests.rs     # JSON-RPC type tests (10 tests)
 ├── types_tests.rs        # MCP domain type tests (11 tests)
 ├── tool_registry_tests.rs # ToolRegistry tests (5 tests)
 ├── handler_tests.rs      # RequestHandler dispatch tests (8 tests)
-└── calendar_types_tests.rs # Calendar domain type tests (12 tests)
+├── calendar_types_tests.rs # Calendar domain type tests (12 tests)
+└── contacts_types_tests.rs # Contacts domain type tests (11 tests)
 
 examples/
 ├── initialize.rs         # Minimal MCP initialize lifecycle demo
-└── calendar_data.rs      # Load and query calendar.json demo
-
-contacts/                 # Contacts domain (Phase 2+, pending)
-    ├── mod.rs
-    ├── contacts_data.rs, contact.rs, phone_number.rs
-    ├── email.rs, address.rs, social_profile.rs
-    ├── contacts_tool.rs
-    └── queries.rs
+├── calendar_data.rs      # Load and query calendar.json demo
+└── contacts_data.rs      # Load and query contacts.json demo
 ```
 
 ## Key Design Decisions

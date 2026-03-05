@@ -1,6 +1,7 @@
 //! MCP Server Playground — a Rust MCP server with calendar and contacts tools.
 
 pub mod calendar;
+pub mod contacts;
 pub mod error;
 pub mod mcp;
 

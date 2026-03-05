@@ -17,13 +17,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Public type tests moved to `tests/`** — Following design-source convention, tests for public types are now in separate integration test files (`tests/error_tests.rs`, `tests/protocol_tests.rs`, `tests/types_tests.rs`, `tests/tool_registry_tests.rs`, `tests/handler_tests.rs`); `pub(crate)` tests remain inline
 - **`main.rs`** — Updated to bootstrap Axum HTTP server with `McpServer::new(handler, addr)`
 
-### Added (Phase 2 — Calendar Types)
+### Added (Phase 2 — Domain Types)
 
 - `src/calendar/` module — 10 type files + facade for calendar domain types
 - Calendar types: `CalendarRoot`, `CalendarData`, `Event`, `Location`, `Coordinates`, `Attendee`, `Recurrence`, `Reminder`, `Attachment`, `Cost`, `CalendarSettings`, `WorkingHours`, `CategoryConfig`, `CalendarMetadata`
+- `src/contacts/` module — 7 type files + facade for contacts domain types
+- Contacts types: `ContactsData`, `Contact`, `PhoneNumber`, `ContactEmail`, `Address`, `SocialProfile`, `ContactsMetadata`
 - `tests/calendar_types_tests.rs` — 12 integration tests (full JSON deserialization, individual type verification, Send+Sync)
+- `tests/contacts_types_tests.rs` — 11 integration tests (full JSON deserialization, individual type verification, Send+Sync)
 - `examples/calendar_data.rs` — Demonstrates loading and querying `calendar.json`
-- Updated `spec/api-analysis.md` — Fixed calendar data shape to match actual JSON (added Attachment, Cost, Coordinates, Location.url, optional Attendee.email, correct Settings/Metadata fields)
+- `examples/contacts_data.rs` — Demonstrates loading and querying `contacts.json`
+- Updated `spec/api-analysis.md` — Fixed both calendar and contacts data shapes to match actual JSON
 
 ### Added (Phase 1 — Foundation)
 

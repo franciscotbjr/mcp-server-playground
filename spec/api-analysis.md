@@ -80,7 +80,7 @@ CalendarRoot                          # Top-level JSON wrapper
 ## Contacts Tool — Data Shape
 
 ```
-ContactsData
+ContactsData                          # Top-level JSON (no wrapper key)
 ├── contacts: Vec<Contact>
 │   ├── id: String
 │   ├── firstName: String
@@ -98,27 +98,30 @@ ContactsData
 │   │   ├── type: String
 │   │   ├── address: String
 │   │   └── primary: Option<bool>
-│   ├── addresses: Vec<Address>
+│   ├── addresses: Option<Vec<Address>>
 │   │   ├── type: String
 │   │   ├── street: String
 │   │   ├── city: String
 │   │   ├── state: String
-│   │   ├── zipCode: String
-│   │   └── country: String
+│   │   ├── postalCode: String
+│   │   ├── country: String
+│   │   └── primary: Option<bool>
 │   ├── socialProfiles: Option<Vec<SocialProfile>>
 │   │   ├── platform: String
+│   │   ├── url: String
 │   │   └── username: String
 │   ├── birthday: Option<String>
-│   ├── anniversary: Option<String>
 │   ├── notes: Option<String>
+│   ├── photo: Option<String>
 │   ├── tags: Vec<String>
 │   ├── favorite: bool
 │   ├── createdAt: String
 │   └── updatedAt: String
-└── metadata: Metadata
+└── metadata: ContactsMetadata
     ├── totalContacts: u32
     ├── lastSync: String
-    └── version: String
+    ├── version: String
+    └── source: String
 ```
 
 ## Dependencies Between Tools

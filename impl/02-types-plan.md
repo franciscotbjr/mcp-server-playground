@@ -30,6 +30,23 @@ Define calendar and contacts domain types (one type per file) for deserializing 
 
 ### Spec fix: `spec/api-analysis.md` updated to match actual JSON ✅
 
-## Contacts Types — PENDING
+## Contacts Types — COMPLETE
 
-Awaiting user approval to proceed.
+### Files created (7 + facade)
+
+| File | Types | Status |
+|------|-------|--------|
+| `contacts/mod.rs` | Facade: mod + pub use | ✅ |
+| `contacts/phone_number.rs` | `PhoneNumber` | ✅ |
+| `contacts/contact_email.rs` | `ContactEmail` | ✅ |
+| `contacts/address.rs` | `Address` | ✅ |
+| `contacts/social_profile.rs` | `SocialProfile` | ✅ |
+| `contacts/contacts_metadata.rs` | `ContactsMetadata` | ✅ |
+| `contacts/contact.rs` | `Contact` | ✅ |
+| `contacts/contacts_data.rs` | `ContactsData` | ✅ |
+
+### Tests: `tests/contacts_types_tests.rs` (11 tests) ✅
+
+### Example: `examples/contacts_data.rs` ✅
+
+### Spec fix: `spec/api-analysis.md` contacts section updated ✅

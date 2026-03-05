@@ -49,24 +49,32 @@ src/
         ├── server_info.rs # ServerInfo
         └── tools_capability.rs # ToolsCapability
 
+├── calendar/             # Calendar domain types
+│   ├── mod.rs            # Facade: mod + pub use
+│   ├── calendar_data.rs  # CalendarRoot, CalendarData (top-level wrappers)
+│   ├── event.rs          # Event (main calendar event struct)
+│   ├── location.rs       # Location, Coordinates
+│   ├── attendee.rs       # Attendee
+│   ├── recurrence.rs     # Recurrence
+│   ├── reminder.rs       # Reminder
+│   ├── attachment.rs     # Attachment
+│   ├── cost.rs           # Cost
+│   ├── calendar_settings.rs # CalendarSettings, WorkingHours, CategoryConfig
+│   └── calendar_metadata.rs # CalendarMetadata
+
 tests/                    # Integration tests for public types
-├── error_tests.rs        # Error enum tests
-├── protocol_tests.rs     # JSON-RPC type tests
-├── types_tests.rs        # MCP domain type tests
-├── tool_registry_tests.rs # ToolRegistry tests
-└── handler_tests.rs      # RequestHandler dispatch tests
+├── error_tests.rs        # Error enum tests (8 tests)
+├── protocol_tests.rs     # JSON-RPC type tests (10 tests)
+├── types_tests.rs        # MCP domain type tests (11 tests)
+├── tool_registry_tests.rs # ToolRegistry tests (5 tests)
+├── handler_tests.rs      # RequestHandler dispatch tests (8 tests)
+└── calendar_types_tests.rs # Calendar domain type tests (12 tests)
 
 examples/
-└── initialize.rs         # Minimal MCP initialize lifecycle demo
+├── initialize.rs         # Minimal MCP initialize lifecycle demo
+└── calendar_data.rs      # Load and query calendar.json demo
 
-calendar/                 # Calendar domain (Phase 2+)
-│   ├── mod.rs
-│   ├── calendar_data.rs, event.rs, location.rs, attendee.rs
-│   ├── recurrence.rs, reminder.rs, calendar_settings.rs
-│   ├── calendar_tool.rs
-│   └── queries.rs
-
-contacts/                 # Contacts domain (Phase 2+)
+contacts/                 # Contacts domain (Phase 2+, pending)
     ├── mod.rs
     ├── contacts_data.rs, contact.rs, phone_number.rs
     ├── email.rs, address.rs, social_profile.rs

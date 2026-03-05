@@ -10,52 +10,71 @@
 ## Calendar Tool — Data Shape
 
 ```
-CalendarData
-├── name: String
-├── timeZone: String
-├── owner: String
-├── events: Vec<Event>
-│   ├── id: String
-│   ├── title: String
-│   ├── description: String
-│   ├── startDateTime: String (ISO 8601)
-│   ├── endDateTime: String (ISO 8601)
-│   ├── location: Option<Location>
-│   │   ├── name: String
-│   │   ├── address: Option<String>
-│   │   ├── type: Option<String>
-│   │   └── coordinates: Option<Coordinates>
-│   ├── attendees: Vec<Attendee>
-│   │   ├── contactId: String
-│   │   ├── name: String
-│   │   ├── email: String
-│   │   ├── status: String
-│   │   └── type: String
-│   ├── category: String
-│   ├── priority: String
-│   ├── status: String
-│   ├── allDay: bool
-│   ├── recurrence: Option<Recurrence>
-│   │   ├── frequency: String
-│   │   ├── interval: u32
-│   │   ├── until: Option<String>
-│   │   └── daysOfWeek: Option<Vec<String>>
-│   ├── reminders: Vec<Reminder>
-│   │   ├── method: String
-│   │   └── minutes: u32
-│   ├── color: Option<String>
-│   ├── createdAt: String
-│   └── updatedAt: String
-├── settings: CalendarSettings
-│   ├── defaultView: String
-│   ├── weekStartsOn: String
-│   ├── workingHours: WorkingHours
-│   ├── defaultReminder: u32
-│   └── categories: Vec<CategoryConfig>
-└── metadata: Metadata
-    ├── totalEvents: u32
-    ├── lastSync: String
-    └── version: String
+CalendarRoot                          # Top-level JSON wrapper
+└── calendar: CalendarData
+    ├── name: String
+    ├── timeZone: String
+    ├── owner: String
+    ├── events: Vec<Event>
+    │   ├── id: String
+    │   ├── title: String
+    │   ├── description: String
+    │   ├── startDateTime: String (ISO 8601)
+    │   ├── endDateTime: String (ISO 8601)
+    │   ├── location: Option<Location>
+    │   │   ├── name: String
+    │   │   ├── address: Option<String>
+    │   │   ├── type: Option<String>
+    │   │   ├── coordinates: Option<Coordinates>
+    │   │   │   ├── latitude: f64
+    │   │   │   └── longitude: f64
+    │   │   └── url: Option<String>
+    │   ├── attendees: Option<Vec<Attendee>>
+    │   │   ├── contactId: String
+    │   │   ├── name: String
+    │   │   ├── email: Option<String>
+    │   │   ├── status: String
+    │   │   └── type: String
+    │   ├── category: String
+    │   ├── priority: String
+    │   ├── status: String
+    │   ├── allDay: bool
+    │   ├── recurrence: Option<Recurrence>
+    │   │   ├── frequency: String
+    │   │   ├── interval: u32
+    │   │   ├── until: Option<String>
+    │   │   └── daysOfWeek: Option<Vec<String>>
+    │   ├── reminders: Vec<Reminder>
+    │   │   ├── method: String
+    │   │   └── minutes: u32
+    │   ├── attachments: Option<Vec<Attachment>>
+    │   │   ├── name: String
+    │   │   ├── type: String
+    │   │   ├── url: Option<String>
+    │   │   └── size: Option<String>
+    │   ├── cost: Option<Cost>
+    │   │   ├── amount: f64
+    │   │   └── currency: String
+    │   ├── notes: Option<String>
+    │   ├── color: Option<String>
+    │   ├── createdAt: String
+    │   └── updatedAt: String
+    ├── settings: CalendarSettings
+    │   ├── defaultReminders: Vec<Reminder>
+    │   ├── defaultDuration: u32
+    │   ├── workingHours: WorkingHours
+    │   │   ├── start: String
+    │   │   ├── end: String
+    │   │   └── workingDays: Vec<String>
+    │   └── categories: HashMap<String, CategoryConfig>
+    │       ├── color: String
+    │       └── icon: String
+    └── metadata: CalendarMetadata
+        ├── totalEvents: u32
+        ├── lastSync: String
+        ├── version: String
+        ├── platform: String
+        └── syncEnabled: bool
 ```
 
 ## Contacts Tool — Data Shape

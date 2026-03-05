@@ -17,7 +17,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Public type tests moved to `tests/`** — Following design-source convention, tests for public types are now in separate integration test files (`tests/error_tests.rs`, `tests/protocol_tests.rs`, `tests/types_tests.rs`, `tests/tool_registry_tests.rs`, `tests/handler_tests.rs`); `pub(crate)` tests remain inline
 - **`main.rs`** — Updated to bootstrap Axum HTTP server with `McpServer::new(handler, addr)`
 
-### Added
+### Added (Phase 2 — Calendar Types)
+
+- `src/calendar/` module — 10 type files + facade for calendar domain types
+- Calendar types: `CalendarRoot`, `CalendarData`, `Event`, `Location`, `Coordinates`, `Attendee`, `Recurrence`, `Reminder`, `Attachment`, `Cost`, `CalendarSettings`, `WorkingHours`, `CategoryConfig`, `CalendarMetadata`
+- `tests/calendar_types_tests.rs` — 12 integration tests (full JSON deserialization, individual type verification, Send+Sync)
+- `examples/calendar_data.rs` — Demonstrates loading and querying `calendar.json`
+- Updated `spec/api-analysis.md` — Fixed calendar data shape to match actual JSON (added Attachment, Cost, Coordinates, Location.url, optional Attendee.email, correct Settings/Metadata fields)
+
+### Added (Phase 1 — Foundation)
 
 - `session.rs` — `SessionState` enum (`Uninitialized`, `Initializing`, `Ready`), `Session` struct, `SessionStore` type alias for per-client lifecycle tracking
 - `sse_handler.rs` — SSE endpoint handlers (`handle_sse`, `handle_message`), lifecycle enforcement (`enforce_lifecycle`), helper functions (`send_to_session`)

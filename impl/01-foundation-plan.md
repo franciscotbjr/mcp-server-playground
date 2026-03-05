@@ -96,7 +96,7 @@ examples/
 ## Quality Checks
 
 - [x] `cargo build` — compiles without errors
-- [x] `cargo test` — 36 tests pass (14 inline + 22 integration)
+- [x] `cargo test` — 68 tests pass (14 inline + 54 integration)
 - [x] `cargo clippy -- -D warnings` — clean
 - [x] `cargo run --example initialize` — completes successfully
 - [x] All types are `Send + Sync`

@@ -7,6 +7,7 @@ use crate::mcp::tools::{
 use crate::mcp::transport::{
     InitializeResult, ServerCapabilities, ServerInfo, ToolsCapability,
 };
+use tracing::info;
 
 /// Handles incoming JSON-RPC requests and dispatches them.
 pub struct RequestHandler {
@@ -23,23 +24,30 @@ impl RequestHandler {
     pub async fn handle(&self, request: &JsonRpcRequest) -> JsonRpcResponse {
         let id = request.id.clone().unwrap_or(serde_json::Value::Null);
 
+        info!(method = %request.method, "Received JSON-RPC request");
+
         match request.method.as_str() {
             "initialize" => self.handle_initialize(id),
             "notifications/initialized" => {
+                info!("Client initialized notification received");
                 // Client acknowledgment — no response needed for notifications,
                 // but if there's an id we still respond.
                 JsonRpcResponse::success(id, serde_json::json!({}))
             }
             "tools/list" => self.handle_tools_list(id),
             "tools/call" => self.handle_tools_call(id, &request.params).await,
-            method => JsonRpcResponse::error(
-                id,
-                crate::mcp::protocol::JsonRpcError::method_not_found(method),
-            ),
+            method => {
+                info!(method, "Unknown method requested");
+                JsonRpcResponse::error(
+                    id,
+                    crate::mcp::protocol::JsonRpcError::method_not_found(method),
+                )
+            }
         }
     }
 
     fn handle_initialize(&self, id: serde_json::Value) -> JsonRpcResponse {
+        info!("Handling initialize — protocol 2024-11-05");
         let result = InitializeResult {
             protocol_version: "2024-11-05".to_string(),
             capabilities: ServerCapabilities {
@@ -57,6 +65,7 @@ impl RequestHandler {
     }
 
     fn handle_tools_list(&self, id: serde_json::Value) -> JsonRpcResponse {
+        info!("Handling tools/list");
         let result = ListToolsResult {
             tools: self.registry.list_definitions(),
         };
@@ -77,6 +86,8 @@ impl RequestHandler {
                 );
             }
         };
+
+        info!(tool = %params.get("name").and_then(|v| v.as_str()).unwrap_or("unknown"), "Handling tools/call");
 
         let call_params: CallToolParams = match serde_json::from_value(params.clone()) {
             Ok(p) => p,

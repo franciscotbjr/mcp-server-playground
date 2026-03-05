@@ -7,6 +7,7 @@
 use crate::error::Result;
 use crate::mcp::handler::RequestHandler;
 use super::app_state::AppState;
+use super::no_delay_listener::NoDelayListener;
 use super::sse_handler::{handle_message, handle_sse};
 
 use axum::routing::{get, post};
@@ -47,7 +48,7 @@ impl McpServer {
             .await
             .map_err(|e| crate::error::Error::IoError(format!("Failed to bind: {e}")))?;
 
-        axum::serve(listener, app)
+        axum::serve(NoDelayListener(listener), app)
             .with_graceful_shutdown(shutdown_signal())
             .await
             .map_err(|e| crate::error::Error::IoError(format!("Server error: {e}")))?;

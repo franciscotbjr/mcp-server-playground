@@ -3,6 +3,7 @@
 mod app_state;
 mod initialize_result;
 mod message_query;
+mod no_delay_listener;
 mod server;
 mod server_capabilities;
 mod server_info;

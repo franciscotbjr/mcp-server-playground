@@ -54,13 +54,9 @@ src/
 └── mcp/
     ├── mod.rs            # Facade: mod + pub use (re-exports from subdirectories)
     ├── handler.rs        # RequestHandler (dispatch)
-    ├── protocol/         # JSON-RPC and MCP server protocol types
+    ├── protocol/         # JSON-RPC 2.0 wire format
     │   ├── mod.rs
-    │   ├── jsonrpc.rs    # JSON-RPC 2.0 types
-    │   ├── initialize_result.rs
-    │   ├── server_capabilities.rs
-    │   ├── server_info.rs
-    │   └── tools_capability.rs
+    │   └── jsonrpc.rs    # JSON-RPC 2.0 types
     ├── tools/            # Tool abstraction, types, and registry
     │   ├── mod.rs
     │   ├── tool_trait.rs # McpTool trait
@@ -71,13 +67,17 @@ src/
     │   ├── call_tool_params.rs
     │   ├── list_tools_result.rs
     │   └── content.rs
-    └── transport/        # SSE transport + HTTP server
+    └── transport/        # SSE transport, HTTP server, server identity
         ├── mod.rs
         ├── server.rs     # McpServer (HTTP bootstrap + graceful shutdown)
         ├── sse_handler.rs # SSE endpoint handlers + lifecycle enforcement
         ├── session.rs    # SessionState, Session, SessionStore
         ├── app_state.rs  # AppState
-        └── message_query.rs # MessageQuery
+        ├── message_query.rs # MessageQuery
+        ├── initialize_result.rs
+        ├── server_capabilities.rs
+        ├── server_info.rs
+        └── tools_capability.rs
 
 tests/
 ├── error_tests.rs

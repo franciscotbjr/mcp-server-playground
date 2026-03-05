@@ -8,10 +8,11 @@ mod handler;
 pub use handler::RequestHandler;
 pub use protocol::{
     JsonRpcError, JsonRpcNotification, JsonRpcRequest, JsonRpcResponse,
-    InitializeResult, ServerCapabilities, ServerInfo, ToolsCapability,
 };
 pub use tools::{
     CallToolParams, CallToolResult, Content, InputSchema, ListToolsResult,
     McpTool, ToolDefinition, ToolRegistry,
 };
-pub use transport::{McpServer, SessionState};
+pub use transport::{
+    InitializeResult, McpServer, ServerCapabilities, ServerInfo, SessionState, ToolsCapability,
+};

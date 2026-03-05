@@ -59,10 +59,10 @@ Architectural decisions and trade-offs for the `mcp-server-playground` project.
 - Decision: Group files into `protocol/`, `tools/`, and `transport/`. `handler.rs` stays at `mcp/` root as it bridges protocol and tools. Each subdirectory has its own `mod.rs` facade. `protocol.rs` renamed to `jsonrpc.rs` to avoid clippy `module_inception` lint.
 - Consequences: Clear domain boundaries. Public API unchanged — `mcp/mod.rs` re-exports everything through subdirectory facades.
 
-**[2026-03-04] Split types.rs and move tool types to tools/**
+**[2026-03-04] Split types.rs and distribute types by domain**
 - Context: `types.rs` contained 10 MCP domain types mixing server-level and tool-level concerns. The one-type-per-file principle applies.
-- Decision: Split into 10 individual files. Move 6 tool-related types (`ToolDefinition`, `InputSchema`, `CallToolResult`, `CallToolParams`, `ListToolsResult`, `Content`) to `tools/`. Keep 4 server types (`InitializeResult`, `ServerCapabilities`, `ServerInfo`, `ToolsCapability`) in `protocol/`.
-- Consequences: Tool types live alongside their trait and registry. `handler.rs` imports tool types from `tools::` and server types from `protocol::`. Public API unchanged.
+- Decision: Split into 10 individual files. Move 6 tool-related types (`ToolDefinition`, `InputSchema`, `CallToolResult`, `CallToolParams`, `ListToolsResult`, `Content`) to `tools/`. Move 4 server identity types (`InitializeResult`, `ServerCapabilities`, `ServerInfo`, `ToolsCapability`) to `transport/` — they describe the server's identity and capabilities, which is a transport/server concern.
+- Consequences: Tool types live alongside their trait and registry. Server types live alongside `McpServer`. `handler.rs` imports from all three domains. `protocol/` contains only `jsonrpc.rs`. Public API unchanged.
 
 **[2026-03-04] Public type tests in `tests/`, `pub(crate)` tests inline**
 - Context: The design-source methodology defines that unit tests of public types should be in separate files, not in the component source file.

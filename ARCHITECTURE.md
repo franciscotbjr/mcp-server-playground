@@ -21,13 +21,9 @@ src/
 └── mcp/                  # MCP protocol layer
     ├── mod.rs            # Facade: mod + pub use (re-exports from subdirectories)
     ├── handler.rs        # RequestHandler (JSON-RPC method dispatcher)
-    ├── protocol/         # JSON-RPC and MCP server protocol types
+    ├── protocol/         # JSON-RPC 2.0 wire format
     │   ├── mod.rs        # Facade: mod + pub use
-    │   ├── jsonrpc.rs    # JSON-RPC 2.0 types (request, response, error, notification)
-    │   ├── initialize_result.rs # InitializeResult
-    │   ├── server_capabilities.rs # ServerCapabilities
-    │   ├── server_info.rs # ServerInfo
-    │   └── tools_capability.rs # ToolsCapability
+    │   └── jsonrpc.rs    # JSON-RPC 2.0 types (request, response, error, notification)
     ├── tools/            # Tool abstraction, types, and registry
     │   ├── mod.rs        # Facade: mod + pub use
     │   ├── tool_trait.rs # McpTool trait (interface for MCP tools)
@@ -38,13 +34,17 @@ src/
     │   ├── call_tool_params.rs # CallToolParams (tools/call parameters)
     │   ├── list_tools_result.rs # ListToolsResult (tools/list result)
     │   └── content.rs    # Content (content block in tool results)
-    └── transport/        # SSE transport + HTTP server
+    └── transport/        # SSE transport, HTTP server, server identity
         ├── mod.rs        # Facade: mod + pub use
         ├── server.rs     # McpServer — HTTP bootstrap + graceful shutdown
         ├── sse_handler.rs # SSE endpoint handlers + lifecycle enforcement
         ├── session.rs    # SessionState, Session, SessionStore (per-client lifecycle)
         ├── app_state.rs  # AppState (shared state for Axum handlers)
-        └── message_query.rs # MessageQuery (POST /message query params)
+        ├── message_query.rs # MessageQuery (POST /message query params)
+        ├── initialize_result.rs # InitializeResult
+        ├── server_capabilities.rs # ServerCapabilities
+        ├── server_info.rs # ServerInfo
+        └── tools_capability.rs # ToolsCapability
 
 tests/                    # Integration tests for public types
 ├── error_tests.rs        # Error enum tests

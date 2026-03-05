@@ -12,6 +12,7 @@ use super::sse_handler::{handle_message, handle_sse};
 
 use axum::routing::{get, post};
 use axum::Router;
+use super::session::SessionStore;
 use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -32,8 +33,10 @@ impl McpServer {
 
     /// Run the HTTP server — serves `GET /sse` and `POST /message`.
     pub async fn run(self) -> Result<()> {
+        let sessions: SessionStore = Arc::new(Mutex::new(HashMap::new()));
+
         let state = AppState {
-            sessions: Arc::new(Mutex::new(HashMap::new())),
+            sessions: sessions.clone(),
             handler: Arc::new(self.handler),
         };
 
@@ -49,7 +52,7 @@ impl McpServer {
             .map_err(|e| crate::error::Error::IoError(format!("Failed to bind: {e}")))?;
 
         axum::serve(NoDelayListener(listener), app)
-            .with_graceful_shutdown(shutdown_signal())
+            .with_graceful_shutdown(shutdown_signal(sessions))
             .await
             .map_err(|e| crate::error::Error::IoError(format!("Server error: {e}")))?;
 
@@ -59,9 +62,28 @@ impl McpServer {
 }
 
 /// Wait for SIGINT (Ctrl-C) for graceful shutdown.
-async fn shutdown_signal() {
+/// Clears all sessions (dropping mpsc senders) so SSE streams end naturally,
+/// then installs a second Ctrl-C handler for forced exit.
+async fn shutdown_signal(sessions: SessionStore) {
     tokio::signal::ctrl_c()
         .await
         .expect("Failed to install Ctrl-C handler");
-    info!("Shutdown signal received.");
+    info!("Shutdown signal received — closing SSE streams...");
+
+    // Drop all sessions — this drops the mpsc senders, ending SSE streams
+    {
+        let mut store = sessions.lock().await;
+        let count = store.len();
+        store.clear();
+        info!("Cleared {count} active session(s)");
+    }
+
+    // Second Ctrl-C forces immediate exit
+    tokio::spawn(async {
+        tokio::signal::ctrl_c()
+            .await
+            .expect("Failed to install second Ctrl-C handler");
+        info!("Forced shutdown.");
+        std::process::exit(1);
+    });
 }

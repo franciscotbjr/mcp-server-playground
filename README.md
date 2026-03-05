@@ -43,6 +43,21 @@ To enable debug logging:
 RUST_LOG=debug cargo run
 ```
 
+## Quick Start with curl
+
+Connect to the SSE endpoint (requires the server to be running):
+
+```bash
+curl -N http://127.0.0.1:3000/sse
+```
+
+Expected output — the server assigns a session and sends the message endpoint URI:
+
+```
+event: endpoint
+data: /message?sessionId=<uuid>
+```
+
 ## Examples
 
 Run the `initialize` example to see the full MCP lifecycle handshake (SSE connect → initialize → initialized):
@@ -57,7 +72,7 @@ cargo run --example initialize
 cargo test
 ```
 
-36 tests total: 14 inline unit tests (`pub(crate)` internals) + 22 integration tests in `tests/`.
+79 tests total: 14 inline unit tests (`pub(crate)` internals) + 65 integration tests in `tests/`.
 
 ## Project Structure
 

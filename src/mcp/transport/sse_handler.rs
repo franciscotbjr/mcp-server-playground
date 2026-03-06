@@ -47,6 +47,7 @@ pub(crate) async fn handle_sse(
 
     let session_id_for_cleanup = session_id.clone();
     let sessions_for_cleanup = state.sessions.clone();
+    let mut shutdown_rx = state.shutdown.clone();
 
     let message_stream = ReceiverStream::new(rx).map(|msg| {
         std::result::Result::<Event, Infallible>::Ok(Event::default().event("message").data(msg))
@@ -54,12 +55,24 @@ pub(crate) async fn handle_sse(
 
     let stream = tokio_stream::once(endpoint_event).chain(message_stream);
 
-    // Detect client disconnect: tx.closed() resolves when rx is dropped (stream ends)
+    // Detect client disconnect OR server shutdown.
+    // - tx.closed() resolves when the client disconnects (Axum drops the stream/rx).
+    // - shutdown_rx.changed() fires when Ctrl-C is pressed; we drop tx_for_cleanup
+    //   so ReceiverStream ends and Axum's graceful shutdown can complete.
     tokio::spawn(async move {
-        tx_for_cleanup.closed().await;
-        info!("SSE connection closed, session_id={session_id_for_cleanup}");
-        let mut sessions = sessions_for_cleanup.lock().await;
-        sessions.remove(&session_id_for_cleanup);
+        let is_client_disconnect = tokio::select! {
+            _ = tx_for_cleanup.closed() => true,
+            _ = shutdown_rx.changed() => false,
+        };
+        drop(tx_for_cleanup);
+
+        if is_client_disconnect {
+            info!("SSE connection closed, session_id={session_id_for_cleanup}");
+            let mut sessions = sessions_for_cleanup.lock().await;
+            sessions.remove(&session_id_for_cleanup);
+        } else {
+            info!("SSE connection closed (shutdown), session_id={session_id_for_cleanup}");
+        }
     });
 
     Sse::new(stream).keep_alive(KeepAlive::default())

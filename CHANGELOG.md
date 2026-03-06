@@ -10,10 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - **SSE latency** — Added `NoDelayListener` wrapper that sets `TCP_NODELAY` on each accepted TCP connection, eliminating Nagle's algorithm buffering delay on small SSE events ([axum#2521](https://github.com/tokio-rs/axum/issues/2521))
+- **Graceful shutdown** — Single Ctrl-C now cleanly shuts down the server by clearing all sessions (dropping mpsc senders), ending SSE streams, and completing Axum's graceful shutdown; second Ctrl-C forces immediate exit
 
 ### Added
 
 - **Tracing logs** — `info!` logs for server initialization steps (`main.rs`) and JSON-RPC request handling (`handler.rs`)
+- **SSE disconnect detection** — Client disconnects are detected via `mpsc::Sender::closed()` and logged; sessions are automatically removed from the `SessionStore`
+- **Shutdown broadcast** — `watch` channel in `AppState` signals SSE cleanup tasks to drop their sender clones on shutdown, allowing `ReceiverStream` to end naturally
 
 ### Changed
 

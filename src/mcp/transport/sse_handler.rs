@@ -24,6 +24,7 @@ pub(crate) async fn handle_sse(
 ) -> Sse<impl tokio_stream::Stream<Item = std::result::Result<Event, Infallible>>> {
     let session_id = Uuid::new_v4().to_string();
     let (tx, rx) = mpsc::channel::<String>(64);
+    let tx_for_cleanup = tx.clone();
 
     // Store session
     {
@@ -53,19 +54,12 @@ pub(crate) async fn handle_sse(
 
     let stream = tokio_stream::once(endpoint_event).chain(message_stream);
 
-    // Spawn a task to clean up the session when the stream ends
+    // Detect client disconnect: tx.closed() resolves when rx is dropped (stream ends)
     tokio::spawn(async move {
-        // This task relies on the receiver being dropped when the SSE connection closes.
-        // The cleanup happens when the mpsc sender fails (connection gone).
-        // We use a simple delay-then-check approach; actual cleanup also happens
-        // in handle_message when sends fail.
-        tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
-        debug!(
-            "Session cleanup task started for session_id={}",
-            session_id_for_cleanup
-        );
-        // The actual removal happens when send fails in handle_message
-        let _ = sessions_for_cleanup;
+        tx_for_cleanup.closed().await;
+        info!("SSE connection closed, session_id={session_id_for_cleanup}");
+        let mut sessions = sessions_for_cleanup.lock().await;
+        sessions.remove(&session_id_for_cleanup);
     });
 
     Sse::new(stream).keep_alive(KeepAlive::default())

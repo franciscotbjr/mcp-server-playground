@@ -20,6 +20,7 @@ use tokio::sync::{watch, Mutex};
 use tracing::info;
 
 /// The MCP server that communicates over HTTP with SSE transport.
+#[derive(Debug)]
 pub struct McpServer {
     handler: RequestHandler,
     addr: SocketAddr,

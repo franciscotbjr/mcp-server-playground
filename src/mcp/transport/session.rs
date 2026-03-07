@@ -5,9 +5,10 @@ use std::sync::Arc;
 use tokio::sync::{mpsc, Mutex};
 
 /// State of an MCP session during its lifecycle.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum SessionState {
     /// SSE connection established, waiting for `initialize` request.
+    #[default]
     Uninitialized,
     /// `initialize` request received, waiting for `notifications/initialized`.
     Initializing,

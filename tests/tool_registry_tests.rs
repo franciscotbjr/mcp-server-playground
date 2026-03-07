@@ -4,6 +4,7 @@ use async_trait::async_trait;
 use mcp_server_playground::{CallToolResult, McpTool, ToolRegistry};
 
 /// A minimal mock tool for testing the registry.
+#[derive(Debug)]
 struct MockTool;
 
 #[async_trait]

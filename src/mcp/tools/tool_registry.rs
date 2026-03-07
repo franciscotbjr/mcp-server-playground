@@ -5,6 +5,7 @@ use super::McpTool;
 use super::{CallToolResult, ToolDefinition};
 
 /// Registry of all available MCP tools.
+#[derive(Debug, Default)]
 pub struct ToolRegistry {
     tools: Vec<Box<dyn McpTool>>,
 }
@@ -34,11 +35,5 @@ impl ToolRegistry {
             .ok_or_else(|| Error::ToolError(format!("Unknown tool: {name}")))?;
 
         tool.execute(arguments).await
-    }
-}
-
-impl Default for ToolRegistry {
-    fn default() -> Self {
-        Self::new()
     }
 }

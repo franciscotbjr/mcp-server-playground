@@ -7,7 +7,7 @@ use async_trait::async_trait;
 
 /// Trait that each MCP tool must implement.
 #[async_trait]
-pub trait McpTool: Send + Sync {
+pub trait McpTool: Send + Sync + std::fmt::Debug {
     /// The tool name as exposed to MCP clients.
     fn name(&self) -> &str;
 

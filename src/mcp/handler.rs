@@ -10,6 +10,7 @@ use crate::mcp::transport::{
 use tracing::info;
 
 /// Handles incoming JSON-RPC requests and dispatches them.
+#[derive(Debug)]
 pub struct RequestHandler {
     registry: ToolRegistry,
 }

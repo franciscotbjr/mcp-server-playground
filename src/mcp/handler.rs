@@ -105,6 +105,10 @@ impl RequestHandler {
                 JsonRpcResponse::success(id, serde_json::to_value(result).unwrap())
             }
             Err(e) => {
+                // Tool execution errors are returned as a success JSON-RPC response
+                // with `isError: true` inside the CallToolResult. A JsonRpcResponse::error
+                // would indicate a protocol-level failure (e.g. method not found),
+                // not a tool-level failure.
                 let error_result = CallToolResult::error(e.to_string());
                 JsonRpcResponse::success(id, serde_json::to_value(error_result).unwrap())
             }

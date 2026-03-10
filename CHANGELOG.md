@@ -28,6 +28,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Public type tests moved to `tests/`** — Following design-source convention, tests for public types are now in separate integration test files (`tests/error_tests.rs`, `tests/protocol_tests.rs`, `tests/types_tests.rs`, `tests/tool_registry_tests.rs`, `tests/handler_tests.rs`); `pub(crate)` tests remain inline
 - **`main.rs`** — Updated to bootstrap Axum HTTP server with `McpServer::new(handler, addr)`
 
+### Added (Phase 3 — Calendar Tool)
+
+- `src/calendar/calendar_tool.rs` — `CalendarTool` struct implementing `McpTool` trait; loads `calendar.json` at construction and dispatches 6 query actions
+- `src/calendar/queries.rs` — Pure query functions: `list_events`, `get_event`, `search_events`, `events_by_date`, `events_by_category`, `upcoming_events`
+- `ToolRegistry::len()` and `is_empty()` methods
+- `CalendarTool` registered in `main.rs` — server now exposes 1 tool via `tools/list`
+- `tests/calendar_tool_tests.rs` — 14 integration tests for all calendar actions
+- `examples/calendar_tool.rs` — MCP client example exercising all calendar actions over SSE (requires running server)
+
 ### Added (Phase 2 — Domain Types)
 
 - `src/calendar/` module — 10 type files + facade for calendar domain types

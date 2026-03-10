@@ -1,4 +1,4 @@
-use mcp_server_playground::{McpServer, RequestHandler, ToolRegistry};
+use mcp_server_playground::{CalendarTool, McpServer, RequestHandler, ToolRegistry};
 use tracing::info;
 use tracing_subscriber::EnvFilter;
 
@@ -14,9 +14,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     info!("Initializing MCP Server Playground v{}", env!("CARGO_PKG_VERSION"));
 
     info!("Creating tool registry...");
-    let registry = ToolRegistry::new();
-    // Tools will be registered here in Phase 3
-    info!("Tool registry created (0 tools registered)");
+    let mut registry = ToolRegistry::new();
+
+    let calendar_tool = CalendarTool::new("calendar.json")?;
+    info!("Loaded calendar tool ({} events)", calendar_tool.event_count());
+    registry.register(Box::new(calendar_tool));
+
+    info!("Tool registry created ({} tool(s) registered)", registry.len());
 
     info!("Creating request handler...");
     let handler = RequestHandler::new(registry);

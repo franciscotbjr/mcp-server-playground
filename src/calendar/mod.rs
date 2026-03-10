@@ -8,9 +8,12 @@ mod calendar_settings;
 mod cost;
 mod event;
 mod location;
+mod calendar_tool;
+mod queries;
 mod recurrence;
 mod reminder;
 
+pub use calendar_tool::CalendarTool;
 pub use attachment::Attachment;
 pub use attendee::Attendee;
 pub use calendar_data::{CalendarData, CalendarRoot};

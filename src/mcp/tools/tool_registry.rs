@@ -21,6 +21,16 @@ impl ToolRegistry {
         self.tools.push(tool);
     }
 
+    /// Number of registered tools.
+    pub fn len(&self) -> usize {
+        self.tools.len()
+    }
+
+    /// Returns `true` if no tools are registered.
+    pub fn is_empty(&self) -> bool {
+        self.tools.is_empty()
+    }
+
     /// List all registered tool definitions.
     pub fn list_definitions(&self) -> Vec<ToolDefinition> {
         self.tools.iter().map(|t| t.to_definition()).collect()

@@ -60,6 +60,8 @@ src/
 │   ├── reminder.rs       # Reminder
 │   ├── attachment.rs     # Attachment
 │   ├── cost.rs           # Cost
+│   ├── calendar_tool.rs  # CalendarTool (McpTool implementation)
+│   ├── queries.rs        # Pure query functions over CalendarData
 │   ├── calendar_settings.rs # CalendarSettings, WorkingHours, CategoryConfig
 │   └── calendar_metadata.rs # CalendarMetadata
 
@@ -80,11 +82,13 @@ tests/                    # Integration tests for public types
 ├── tool_registry_tests.rs # ToolRegistry tests (5 tests)
 ├── handler_tests.rs      # RequestHandler dispatch tests (8 tests)
 ├── calendar_types_tests.rs # Calendar domain type tests (12 tests)
+├── calendar_tool_tests.rs # CalendarTool MCP tool tests (14 tests)
 └── contacts_types_tests.rs # Contacts domain type tests (11 tests)
 
 examples/
 ├── initialize.rs         # Minimal MCP initialize lifecycle demo
 ├── calendar_data.rs      # Load and query calendar.json demo
+├── calendar_tool.rs      # MCP client exercising all calendar actions via SSE
 └── contacts_data.rs      # Load and query contacts.json demo
 ```
 

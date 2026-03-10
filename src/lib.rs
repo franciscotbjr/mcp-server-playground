@@ -7,6 +7,7 @@ pub mod mcp;
 
 // Re-exports for ergonomic access
 pub use calendar::CalendarTool;
+pub use contacts::ContactsTool;
 pub use error::{Error, Result};
 pub use mcp::{
     CallToolParams, CallToolResult, Content, InitializeResult, InputSchema, JsonRpcError,

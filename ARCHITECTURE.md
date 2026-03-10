@@ -73,6 +73,8 @@ src/
 │   ├── contact_email.rs  # ContactEmail
 │   ├── address.rs        # Address
 │   ├── social_profile.rs # SocialProfile
+│   ├── contacts_tool.rs  # ContactsTool (McpTool implementation)
+│   ├── queries.rs        # Pure query functions over ContactsData
 │   └── contacts_metadata.rs # ContactsMetadata
 
 tests/                    # Integration tests for public types
@@ -83,13 +85,15 @@ tests/                    # Integration tests for public types
 ├── handler_tests.rs      # RequestHandler dispatch tests (8 tests)
 ├── calendar_types_tests.rs # Calendar domain type tests (12 tests)
 ├── calendar_tool_tests.rs # CalendarTool MCP tool tests (14 tests)
+├── contacts_tool_tests.rs # ContactsTool MCP tool tests (13 tests)
 └── contacts_types_tests.rs # Contacts domain type tests (11 tests)
 
 examples/
 ├── initialize.rs         # Minimal MCP initialize lifecycle demo
 ├── calendar_data.rs      # Load and query calendar.json demo
 ├── calendar_tool.rs      # MCP client exercising all calendar actions via SSE
-└── contacts_data.rs      # Load and query contacts.json demo
+├── contacts_data.rs      # Load and query contacts.json demo
+└── contacts_tool.rs      # MCP client exercising all contacts actions via SSE
 ```
 
 ## Key Design Decisions

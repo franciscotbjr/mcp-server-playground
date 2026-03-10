@@ -1,4 +1,4 @@
-use mcp_server_playground::{CalendarTool, McpServer, RequestHandler, ToolRegistry};
+use mcp_server_playground::{CalendarTool, ContactsTool, McpServer, RequestHandler, ToolRegistry};
 use tracing::info;
 use tracing_subscriber::EnvFilter;
 
@@ -19,6 +19,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let calendar_tool = CalendarTool::new("calendar.json")?;
     info!("Loaded calendar tool ({} events)", calendar_tool.event_count());
     registry.register(Box::new(calendar_tool));
+
+    let contacts_tool = ContactsTool::new("contacts.json")?;
+    info!("Loaded contacts tool ({} contacts)", contacts_tool.contact_count());
+    registry.register(Box::new(contacts_tool));
 
     info!("Tool registry created ({} tool(s) registered)", registry.len());
 

@@ -28,6 +28,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Public type tests moved to `tests/`** — Following design-source convention, tests for public types are now in separate integration test files (`tests/error_tests.rs`, `tests/protocol_tests.rs`, `tests/types_tests.rs`, `tests/tool_registry_tests.rs`, `tests/handler_tests.rs`); `pub(crate)` tests remain inline
 - **`main.rs`** — Updated to bootstrap Axum HTTP server with `McpServer::new(handler, addr)`
 
+### Added (Phase 3 — Contacts Tool)
+
+- `src/contacts/contacts_tool.rs` — `ContactsTool` struct implementing `McpTool` trait; loads `contacts.json` at construction and dispatches 5 query actions
+- `src/contacts/queries.rs` — Pure query functions: `list_contacts`, `get_contact`, `search_contacts`, `contacts_by_tag`, `favorite_contacts`
+- `ContactsTool` registered in `main.rs` — server now exposes 2 tools via `tools/list`
+- `tests/contacts_tool_tests.rs` — 13 integration tests for all contacts actions
+- `examples/contacts_tool.rs` — MCP client example exercising all contacts actions over SSE (requires running server)
+
 ### Added (Phase 3 — Calendar Tool)
 
 - `src/calendar/calendar_tool.rs` — `CalendarTool` struct implementing `McpTool` trait; loads `calendar.json` at construction and dispatches 6 query actions

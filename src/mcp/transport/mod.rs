@@ -1,14 +1,13 @@
-//! SSE transport layer — HTTP server, session management, endpoint handlers, server identity.
+//! Streamable HTTP transport layer — HTTP server, session management, endpoint handlers, server identity.
 
 mod app_state;
 mod initialize_result;
-mod message_query;
 mod no_delay_listener;
 mod server;
 mod server_capabilities;
 mod server_info;
 mod session;
-mod sse_handler;
+mod streamable_handler;
 mod tools_capability;
 
 pub use initialize_result::InitializeResult;

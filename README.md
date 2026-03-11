@@ -4,12 +4,13 @@ A Rust-based MCP (Model Context Protocol) server that exposes two tools for AI a
 
 ## Overview
 
-This project implements an MCP server over **SSE (Server-Sent Events)** transport, following the [MCP specification (2024-11-05)](https://modelcontextprotocol.io/). It serves as a learning/playground project for MCP server development in Rust.
+This project implements an MCP server over **Streamable HTTP** transport, following the [MCP specification (2025-03-26)](https://modelcontextprotocol.io/). It serves as a learning/playground project for MCP server development in Rust.
 
-The server exposes two HTTP endpoints:
+The server exposes a single `/mcp` endpoint supporting three HTTP methods:
 
-- **`GET /sse`** — Opens an SSE stream; the server sends an `endpoint` event with the message URI
-- **`POST /message?sessionId=<uuid>`** — Receives JSON-RPC requests from the client
+- **`POST /mcp`** — Client sends JSON-RPC requests (single or batch); server responds with JSON. Session ID via `Mcp-Session-Id` header.
+- **`GET /mcp`** — Opens a passive SSE stream for server-initiated messages (requires `Mcp-Session-Id` header).
+- **`DELETE /mcp`** — Terminates a session (requires `Mcp-Session-Id` header).
 
 ### Tools
 
@@ -45,22 +46,24 @@ RUST_LOG=debug cargo run
 
 ## Quick Start with curl
 
-Connect to the SSE endpoint (requires the server to be running):
+Send an `initialize` request (requires the server to be running):
 
 ```bash
-curl -N http://127.0.0.1:3000/sse
+curl -X POST http://127.0.0.1:3000/mcp \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"curl","version":"1.0"}}}'
 ```
 
-Expected output — the server assigns a session and sends the message endpoint URI:
+Expected output — JSON-RPC response with server capabilities and a `Mcp-Session-Id` response header:
 
-```
-event: endpoint
-data: /message?sessionId=<uuid>
+```json
+{"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"2025-03-26","capabilities":{"tools":{"listChanged":false}},"serverInfo":{"name":"mcp-server-playground","version":"0.1.0"}}}
 ```
 
 ## Examples
 
-Run the `initialize` example to see the full MCP lifecycle handshake (SSE connect → initialize → initialized):
+Run the `initialize` example to see the full MCP lifecycle handshake (`POST /mcp` → initialize → initialized):
 
 ```bash
 cargo run --example initialize
@@ -72,7 +75,7 @@ cargo run --example initialize
 cargo test
 ```
 
-79 tests total: 14 inline unit tests (`pub(crate)` internals) + 65 integration tests in `tests/`.
+119 tests total: 14 inline unit tests (`pub(crate)` internals) + 105 integration tests in `tests/`.
 
 ## Project Structure
 

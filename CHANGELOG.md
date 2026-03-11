@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed (Phase 4 — Streamable HTTP Transport)
+
+- **Transport: SSE → Streamable HTTP** — Migrated from deprecated MCP spec 2024-11-05 (`GET /sse` + `POST /message`) to MCP spec 2025-03-26 (`POST|GET|DELETE /mcp`). Responses now returned directly in HTTP response body instead of via SSE channel.
+- **Protocol version** — `protocolVersion` updated from `2024-11-05` to `2025-03-26`
+- **Session management via header** — Sessions identified by `Mcp-Session-Id` HTTP header instead of `?sessionId=` query parameter
+- **JSON-RPC batch support** — `POST /mcp` accepts both single JSON-RPC objects and batch arrays
+- **`DELETE /mcp`** — New endpoint to explicitly terminate sessions
+- **`GET /mcp`** — Passive SSE stream for server-initiated messages (spec compliance)
+- `src/mcp/transport/streamable_handler.rs` — New handler with `handle_post_mcp`, `handle_get_mcp`, `handle_delete_mcp` + lifecycle enforcement + 14 inline tests
+- `tests/streamable_http_tests.rs` — 13 integration tests (headers, status codes, batch, lifecycle, DELETE)
+- Examples updated — `initialize.rs`, `calendar_tool.rs`, `contacts_tool.rs` rewritten for Streamable HTTP
+
+### Removed (Phase 4)
+
+- `src/mcp/transport/sse_handler.rs` — Replaced by `streamable_handler.rs`
+- `src/mcp/transport/message_query.rs` — `sessionId` query param no longer used
+
 ### Fixed
 
 - **SSE latency** — Added `NoDelayListener` wrapper that sets `TCP_NODELAY` on each accepted TCP connection, eliminating Nagle's algorithm buffering delay on small SSE events ([axum#2521](https://github.com/tokio-rs/axum/issues/2521))

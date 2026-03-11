@@ -4,12 +4,13 @@
 
 `mcp-server-playground` is a Rust-based MCP (Model Context Protocol) server that exposes two tools — **calendar** and **contacts** — with simulated data backed by local JSON files.
 
-The server communicates over **SSE (Server-Sent Events)** transport via HTTP, using the JSON-RPC 2.0 protocol as defined by the MCP specification (2024-11-05).
+The server communicates over **Streamable HTTP** transport, using the JSON-RPC 2.0 protocol as defined by the MCP specification (2025-03-26).
 
-Two HTTP endpoints are exposed:
+A single `/mcp` endpoint is exposed supporting three HTTP methods:
 
-- **`GET /sse`** — Opens an SSE stream. The server sends an `endpoint` event with the URI for posting messages, then delivers all responses as `message` events.
-- **`POST /message?sessionId=<uuid>`** — Receives JSON-RPC requests from the client.
+- **`POST /mcp`** — Client sends JSON-RPC requests (single or batch). Server responds with JSON directly in the response body. Session ID is passed via `Mcp-Session-Id` header.
+- **`GET /mcp`** — Opens a passive SSE stream for server-initiated messages (requires `Mcp-Session-Id` header).
+- **`DELETE /mcp`** — Terminates a session (requires `Mcp-Session-Id` header).
 
 ## Module Structure
 
@@ -37,13 +38,12 @@ src/
     │   ├── call_tool_params.rs # CallToolParams (tools/call parameters)
     │   ├── list_tools_result.rs # ListToolsResult (tools/list result)
     │   └── content.rs    # Content (content block in tool results)
-    └── transport/        # SSE transport, HTTP server, server identity
+    └── transport/        # Streamable HTTP transport, HTTP server, server identity
         ├── mod.rs        # Facade: mod + pub use
         ├── server.rs     # McpServer — HTTP bootstrap + graceful shutdown
-        ├── sse_handler.rs # SSE endpoint handlers + lifecycle enforcement
+        ├── streamable_handler.rs # POST/GET/DELETE /mcp handlers + lifecycle enforcement
         ├── session.rs    # SessionState, Session, SessionStore (per-client lifecycle)
         ├── app_state.rs  # AppState (shared state for Axum handlers)
-        ├── message_query.rs # MessageQuery (POST /message query params)
         ├── no_delay_listener.rs # NoDelayListener (TCP_NODELAY wrapper for TcpListener)
         ├── initialize_result.rs # InitializeResult
         ├── server_capabilities.rs # ServerCapabilities
@@ -86,21 +86,22 @@ tests/                    # Integration tests for public types
 ├── calendar_types_tests.rs # Calendar domain type tests (12 tests)
 ├── calendar_tool_tests.rs # CalendarTool MCP tool tests (14 tests)
 ├── contacts_tool_tests.rs # ContactsTool MCP tool tests (13 tests)
-└── contacts_types_tests.rs # Contacts domain type tests (11 tests)
+├── contacts_types_tests.rs # Contacts domain type tests (11 tests)
+└── streamable_http_tests.rs # Streamable HTTP transport integration tests (13 tests)
 
 examples/
-├── initialize.rs         # Minimal MCP initialize lifecycle demo
+├── initialize.rs         # Minimal MCP initialize lifecycle demo (Streamable HTTP)
 ├── calendar_data.rs      # Load and query calendar.json demo
-├── calendar_tool.rs      # MCP client exercising all calendar actions via SSE
+├── calendar_tool.rs      # MCP client exercising all calendar actions via Streamable HTTP
 ├── contacts_data.rs      # Load and query contacts.json demo
-└── contacts_tool.rs      # MCP client exercising all contacts actions via SSE
+└── contacts_tool.rs      # MCP client exercising all contacts actions via Streamable HTTP
 ```
 
 ## Key Design Decisions
 
 - **Single crate, no feature flags** — project scope is small enough that feature gating adds unnecessary complexity.
-- **SSE transport** — replaces stdio; follows MCP spec 2024-11-05 with `GET /sse` + `POST /message`.
-- **Session management** — each SSE connection gets a UUID-identified session with lifecycle state tracking (`Uninitialized → Initializing → Ready`).
+- **Streamable HTTP transport** — follows MCP spec 2025-03-26 with a single `POST|GET|DELETE /mcp` endpoint. Supports JSON-RPC batch requests.
+- **Session management** — each `initialize` request creates a UUID-identified session (`Mcp-Session-Id` header). Lifecycle state tracking: `Initializing → Ready`.
 - **One type per file** — following the design-source methodology for clarity and maintainability.
 - **Facade pattern** — each module's `mod.rs` contains only `mod` and `pub use` declarations.
 - **Public type tests in `tests/`** — following design-source convention; `pub(crate)` tests remain inline.
@@ -113,20 +114,23 @@ examples/
 ```
 Client                          Server
   │                               │
-  ├── GET /sse ──────────────────►│ creates Session (UUID, mpsc channel)
-  │◄── SSE event: endpoint ──────┤ sends message URI
+  ├── POST /mcp ─────────────────►│ {initialize}
+  │   Accept: application/json    │ → creates Session (UUID)
+  │◄── 200 JSON ─────────────────┤ → response + Mcp-Session-Id header
   │                               │
-  ├── POST /message ─────────────►│ parse JSON-RPC
-  │   {initialize}                │ → enforce_lifecycle()
-  │                               │ → RequestHandler::handle()
-  │◄── SSE event: message ───────┤ sends response via mpsc → SSE stream
+  ├── POST /mcp ─────────────────►│ {notifications/initialized}
+  │   Mcp-Session-Id: <uuid>      │ → session state = Ready
+  │◄── 202 Accepted ─────────────┤
   │                               │
-  ├── POST /message ─────────────►│ {notifications/initialized}
-  │   session → Ready             │ → session state = Ready
+  ├── POST /mcp ─────────────────►│ {tools/list, tools/call, ...}
+  │   Mcp-Session-Id: <uuid>      │ → ToolRegistry → McpTool::execute()
+  │◄── 200 JSON ─────────────────┤ → CallToolResult → JsonRpcResponse
   │                               │
-  ├── POST /message ─────────────►│ {tools/list, tools/call, ...}
-  │                               │ → ToolRegistry → McpTool::execute()
-  │◄── SSE event: message ───────┤ → CallToolResult → JsonRpcResponse
+  ├── GET /mcp (optional) ───────►│ passive SSE stream for server push
+  │◄── SSE events ───────────────┤
+  │                               │
+  ├── DELETE /mcp ───────────────►│ terminate session
+  │◄── 200 OK ───────────────────┤
 ```
 
 ## Dependencies
@@ -134,7 +138,7 @@ Client                          Server
 | Crate | Purpose |
 |-------|---------|
 | `tokio` | Async runtime (HTTP server, signal handling) |
-| `axum` | HTTP framework (SSE endpoints, routing) |
+| `axum` | HTTP framework (Streamable HTTP endpoints, routing) |
 | `tower-http` | HTTP middleware (CORS) |
 | `tokio-stream` | Async stream utilities for SSE |
 | `uuid` | Session ID generation (v4) |

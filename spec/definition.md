@@ -9,13 +9,13 @@ A Rust-based MCP (Model Context Protocol) server that exposes two tools for AI a
 
 Data is simulated via local JSON files (`calendar.json`, `contacts.json`) rather than real service integrations.
 
-The server communicates over **SSE (Server-Sent Events)** transport via HTTP, following the MCP specification (2024-11-05). Two endpoints are exposed: `GET /sse` (SSE stream) and `POST /message` (client→server JSON-RPC).
+The server communicates over **Streamable HTTP** transport, following the MCP specification (2025-03-26). A single `/mcp` endpoint is exposed supporting `POST` (JSON-RPC requests/responses), `GET` (passive SSE stream), and `DELETE` (session termination).
 
 ## Goals
 
-- Implement a fully functional MCP server over SSE transport
+- Implement a fully functional MCP server over Streamable HTTP transport
 - Implement the full MCP `initialize` lifecycle (3-step handshake)
-- Expose two tools following the MCP specification (2024-11-05)
+- Expose two tools following the MCP specification (2025-03-26)
 - Provide rich query capabilities (list, get by ID, search, filter)
 - Follow the design-source methodology (spec-first, one-type-per-file, with-method chain, etc.)
 - Serve as a learning/playground project for MCP server development in Rust
@@ -23,7 +23,8 @@ The server communicates over **SSE (Server-Sent Events)** transport via HTTP, fo
 ## Non-Goals
 
 - Real calendar/contacts service integration (Google Calendar, Outlook, etc.)
-- Stdio transport (replaced by SSE)
+- Stdio transport (replaced by Streamable HTTP)
+- Legacy SSE transport (`GET /sse` + `POST /message`)
 - Persistent state or write operations (read-only tools)
 - Authentication or authorization
 
@@ -31,7 +32,7 @@ The server communicates over **SSE (Server-Sent Events)** transport via HTTP, fo
 
 | Phase | Version | Focus |
 |-------|---------|-------|
-| Foundation | v0.1.0 | Project structure, error handling, MCP protocol types, SSE transport, session management, initialize lifecycle, server bootstrap, tests, example, documentation |
+| Foundation | v0.1.0 | Project structure, error handling, MCP protocol types, Streamable HTTP transport, session management, initialize lifecycle, server bootstrap, tests, example, documentation |
 | Domain Types | v0.2.0 | Calendar and contacts data types (one per file), deserialization, with-method chain |
 | Tool Implementation | v0.3.0 | McpTool implementations, query logic, tool registry wiring, integration tests |
 | Polish | v0.4.0 | Robustness, examples, documentation polish, release checklist |

@@ -78,7 +78,7 @@ impl McpTool for CalendarTool {
                     "description": "Status filter (optional for list_events)"
                 },
                 "count": {
-                    "type": "integer",
+                    "type": "number",
                     "description": "Number of events to return (optional for upcoming_events, default: 5)"
                 }
             },

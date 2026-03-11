@@ -66,5 +66,10 @@ Architectural decisions and trade-offs for the `mcp-server-playground` project.
 
 **[2026-03-04] Public type tests in `tests/`, `pub(crate)` tests inline**
 - Context: The design-source methodology defines that unit tests of public types should be in separate files, not in the component source file.
-- Decision: Move all public type tests to `tests/{component}_tests.rs`. Keep `pub(crate)` tests (session internals, SSE handler internals) as inline `#[cfg(test)] mod tests` since integration tests cannot access `pub(crate)` items.
-- Consequences: Clean source files, clear separation between implementation and testing. 22 integration tests in `tests/`, 14 inline tests for `pub(crate)` internals.
+- Decision: Move all public type tests to `tests/{component}_tests.rs`. Keep `pub(crate)` tests (session internals, handler internals) as inline `#[cfg(test)] mod tests` since integration tests cannot access `pub(crate)` items.
+- Consequences: Clean source files, clear separation between implementation and testing. 105 integration tests in `tests/`, 14 inline tests for `pub(crate)` internals.
+
+**[2026-03-10] Streamable HTTP transport replaces SSE**
+- Context: The MCP specification 2025-03-26 introduces Streamable HTTP as the recommended transport, deprecating the SSE transport (`GET /sse` + `POST /message`). Streamable HTTP uses a single `/mcp` endpoint with `POST`, `GET`, and `DELETE` methods, session management via `Mcp-Session-Id` header, and supports JSON-RPC batch requests.
+- Decision: Replace SSE transport with Streamable HTTP. Remove `sse_handler.rs` and `message_query.rs`. Create `streamable_handler.rs` with `handle_post_mcp`, `handle_get_mcp`, `handle_delete_mcp`. Update protocol version to `2025-03-26`.
+- Consequences: Responses returned directly in HTTP response body (no longer via SSE channel). Simpler client integration — standard HTTP POST with JSON. Passive SSE stream (`GET /mcp`) still available for server-initiated push. Session termination via `DELETE /mcp`. Batch JSON-RPC support. Compatible with n8n and other MCP clients.

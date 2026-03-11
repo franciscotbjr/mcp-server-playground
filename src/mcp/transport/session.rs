@@ -16,11 +16,16 @@ pub enum SessionState {
     Ready,
 }
 
-/// A single client session backed by an SSE connection.
+/// A single client session.
 #[derive(Debug)]
 pub(crate) struct Session {
     pub(crate) state: SessionState,
+    /// Channel sender for server→client push via passive SSE stream.
     pub(crate) tx: mpsc::Sender<String>,
+    /// Channel receiver — held until `GET /mcp` claims it for the SSE stream.
+    pub(crate) sse_rx: Option<mpsc::Receiver<String>>,
+    /// Whether a passive SSE stream (`GET /mcp`) is currently open.
+    pub(crate) sse_active: bool,
 }
 
 /// Thread-safe store of all active sessions.
@@ -32,12 +37,16 @@ mod tests {
 
     #[test]
     fn test_session_state_default() {
-        let (tx, _rx) = mpsc::channel(1);
+        let (tx, rx) = mpsc::channel(1);
         let session = Session {
             state: SessionState::Uninitialized,
             tx,
+            sse_rx: Some(rx),
+            sse_active: false,
         };
         assert_eq!(session.state, SessionState::Uninitialized);
+        assert!(!session.sse_active);
+        assert!(session.sse_rx.is_some());
     }
 
     #[test]

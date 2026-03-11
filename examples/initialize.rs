@@ -1,16 +1,12 @@
-//! Minimal example demonstrating the MCP `initialize` lifecycle over SSE.
+//! Minimal example demonstrating the MCP `initialize` lifecycle over Streamable HTTP.
 //!
 //! 1. Starts the MCP server on an ephemeral port
-//! 2. Connects to `GET /sse` and reads the `endpoint` event
-//! 3. Sends `initialize` request via `POST /message`
-//! 4. Reads the `initialize` response from the SSE stream
-//! 5. Sends `notifications/initialized` to complete the handshake
+//! 2. Sends `initialize` request via `POST /mcp` — receives `Mcp-Session-Id`
+//! 3. Sends `notifications/initialized` via `POST /mcp` with session header
 //!
 //! Run with: `cargo run --example initialize`
 
-use futures_util::StreamExt;
 use mcp_server_playground::{McpServer, RequestHandler, ToolRegistry};
-use tokio::io::AsyncBufReadExt;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -35,98 +31,62 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
 
     let client = reqwest::Client::new();
+    let mcp_url = format!("http://{addr}/mcp");
 
-    // --- Step 1: Connect to GET /sse (streaming) ---
-    println!("\n--- Step 1: Connecting to GET /sse ---");
-    let sse_url = format!("http://{addr}/sse");
-    let sse_response = client.get(&sse_url).send().await?;
-    println!("SSE connection status: {}", sse_response.status());
-
-    // Read SSE stream as lines until we find the `endpoint` event
-    let byte_stream = sse_response.bytes_stream();
-    let stream_reader = tokio_util::io::StreamReader::new(
-        byte_stream.map(|result| {
-            result.map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))
-        }),
-    );
-    let mut lines = tokio::io::BufReader::new(stream_reader).lines();
-
-    let mut message_path = String::new();
-    while let Some(line) = lines.next_line().await? {
-        println!("  SSE: {line}");
-        if let Some(path) = line.strip_prefix("data: /message") {
-            message_path = format!("/message{path}");
-            break;
-        }
-    }
-
-    if message_path.is_empty() {
-        eprintln!("ERROR: Did not receive endpoint event");
-        server_handle.abort();
-        return Ok(());
-    }
-
-    let message_url = format!("http://{addr}{message_path}");
-    println!("Message endpoint: {message_url}");
-
-    // Keep the SSE stream alive in background so responses can arrive
-    let sse_reader_handle = tokio::spawn(async move {
-        while let Ok(Some(line)) = lines.next_line().await {
-            if !line.is_empty() {
-                println!("  SSE event: {line}");
-            }
-        }
-    });
-
-    // --- Step 2: Send initialize request ---
-    println!("\n--- Step 2: Sending initialize request ---");
-    let initialize_request = serde_json::json!({
-        "jsonrpc": "2.0",
-        "id": 1,
-        "method": "initialize",
-        "params": {
-            "protocolVersion": "2024-11-05",
-            "capabilities": {},
-            "clientInfo": {
-                "name": "example-client",
-                "version": "0.1.0"
-            }
-        }
-    });
-
+    // --- Step 1: Send initialize request ---
+    println!("\n--- Step 1: POST /mcp — initialize ---");
     let resp = client
-        .post(&message_url)
+        .post(&mcp_url)
         .header("Content-Type", "application/json")
-        .body(serde_json::to_string(&initialize_request)?)
+        .header("Accept", "application/json, text/event-stream")
+        .body(serde_json::to_string(&serde_json::json!({
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "initialize",
+            "params": {
+                "protocolVersion": "2025-03-26",
+                "capabilities": {},
+                "clientInfo": {
+                    "name": "example-client",
+                    "version": "0.1.0"
+                }
+            }
+        }))?)
         .send()
         .await?;
-    println!("POST /message status: {}", resp.status());
 
-    // Give the server a moment to process and send the SSE response
-    tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
+    println!("  Status: {}", resp.status());
 
-    // --- Step 3: Send notifications/initialized ---
-    println!("\n--- Step 3: Sending notifications/initialized ---");
-    let initialized_notification = serde_json::json!({
-        "jsonrpc": "2.0",
-        "method": "notifications/initialized"
-    });
+    let session_id = resp
+        .headers()
+        .get("mcp-session-id")
+        .and_then(|v| v.to_str().ok())
+        .map(String::from)
+        .expect("Server must return Mcp-Session-Id header");
+    println!("  Mcp-Session-Id: {session_id}");
 
+    let body: serde_json::Value = resp.json().await?;
+    println!("  Response: {}", serde_json::to_string_pretty(&body)?);
+
+    // --- Step 2: Send notifications/initialized ---
+    println!("\n--- Step 2: POST /mcp — notifications/initialized ---");
     let resp = client
-        .post(&message_url)
+        .post(&mcp_url)
         .header("Content-Type", "application/json")
-        .body(serde_json::to_string(&initialized_notification)?)
+        .header("Accept", "application/json, text/event-stream")
+        .header("Mcp-Session-Id", &session_id)
+        .body(serde_json::to_string(&serde_json::json!({
+            "jsonrpc": "2.0",
+            "method": "notifications/initialized"
+        }))?)
         .send()
         .await?;
-    println!("POST /message status: {}", resp.status());
-
-    tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
+    println!("  Status: {} (202 = accepted notification)", resp.status());
 
     println!("\n--- Initialize lifecycle complete! ---");
     println!("Session is now in Ready state.");
 
     // Clean up
-    sse_reader_handle.abort();
     server_handle.abort();
     Ok(())
 }

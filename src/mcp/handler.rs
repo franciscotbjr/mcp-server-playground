@@ -48,9 +48,9 @@ impl RequestHandler {
     }
 
     fn handle_initialize(&self, id: serde_json::Value) -> JsonRpcResponse {
-        info!("Handling initialize — protocol 2024-11-05");
+        info!("Handling initialize — protocol 2025-03-26");
         let result = InitializeResult {
-            protocol_version: "2024-11-05".to_string(),
+            protocol_version: "2025-03-26".to_string(),
             capabilities: ServerCapabilities {
                 tools: Some(ToolsCapability {
                     list_changed: Some(false),

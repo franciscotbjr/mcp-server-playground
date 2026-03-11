@@ -1,16 +1,17 @@
-//! MCP server — HTTP bootstrap with SSE transport (MCP spec 2024-11-05).
+//! MCP server — HTTP bootstrap with Streamable HTTP transport (MCP spec 2025-03-26).
 //!
-//! Exposes two endpoints via the handlers in `sse_handler`:
-//! - `GET /sse` — client connects here to open an SSE stream
-//! - `POST /message?sessionId=<uuid>` — client sends JSON-RPC messages here
+//! Exposes a single `/mcp` endpoint via the handlers in `streamable_handler`:
+//! - `POST /mcp` — client sends JSON-RPC messages, server responds with JSON
+//! - `GET  /mcp` — client opens passive SSE stream for server-initiated messages
+//! - `DELETE /mcp` — client terminates session
 
 use crate::error::Result;
 use crate::mcp::handler::RequestHandler;
 use super::app_state::AppState;
 use super::no_delay_listener::NoDelayListener;
-use super::sse_handler::{handle_message, handle_sse};
+use super::streamable_handler::{handle_delete_mcp, handle_get_mcp, handle_post_mcp};
 
-use axum::routing::{get, post};
+use axum::routing::{delete, get, post};
 use axum::Router;
 use super::session::SessionStore;
 use std::collections::HashMap;
@@ -19,7 +20,7 @@ use std::sync::Arc;
 use tokio::sync::{watch, Mutex};
 use tracing::info;
 
-/// The MCP server that communicates over HTTP with SSE transport.
+/// The MCP server that communicates over HTTP with Streamable HTTP transport.
 #[derive(Debug)]
 pub struct McpServer {
     handler: RequestHandler,
@@ -32,7 +33,7 @@ impl McpServer {
         Self { handler, addr }
     }
 
-    /// Run the HTTP server — serves `GET /sse` and `POST /message`.
+    /// Run the HTTP server — serves `POST /mcp`, `GET /mcp`, `DELETE /mcp`.
     pub async fn run(self) -> Result<()> {
         let sessions: SessionStore = Arc::new(Mutex::new(HashMap::new()));
         let (shutdown_tx, shutdown_rx) = watch::channel(false);
@@ -44,11 +45,13 @@ impl McpServer {
         };
 
         let app = Router::new()
-            .route("/sse", get(handle_sse))
-            .route("/message", post(handle_message))
+            .route("/mcp", post(handle_post_mcp))
+            .route("/mcp", get(handle_get_mcp))
+            .route("/mcp", delete(handle_delete_mcp))
             .with_state(state);
 
         info!("MCP server listening on {}", self.addr);
+        info!("Endpoint: POST|GET|DELETE /mcp");
 
         let listener = tokio::net::TcpListener::bind(self.addr)
             .await

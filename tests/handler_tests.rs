@@ -17,7 +17,7 @@ async fn test_handler_initialize() {
     let response = handler.handle(&request).await;
     assert!(response.error.is_none());
     let result = response.result.unwrap();
-    assert_eq!(result["protocolVersion"], "2024-11-05");
+    assert_eq!(result["protocolVersion"], "2025-03-26");
     assert_eq!(result["serverInfo"]["name"], "mcp-server-playground");
 }
 

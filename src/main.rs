@@ -31,7 +31,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let addr = std::net::SocketAddr::from(([127, 0, 0, 1], 3000));
     info!("Starting HTTP server on http://{addr}");
-    info!("Endpoints: GET /sse, POST /message");
+    info!("Endpoint: POST|GET|DELETE /mcp");
     let server = McpServer::new(handler, addr);
 
     server.run().await?;
